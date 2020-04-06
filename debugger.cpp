@@ -13,9 +13,13 @@ vector<char> Program,Full;
 vector<int> ddid;
 vector<pair<int,pair<int,int>>> ddpos;
 int dds;
+int Curpos;
 }
 
 void CheckParenthesis(const vector<char> &);
+
+void PrintCodeatPos(int pos){
+}
 
 void StartDebug(const vector<string> &files){
     int Fileid=1,Lineid,Colid;
@@ -67,6 +71,8 @@ void StartDebug(const vector<string> &files){
             mvwaddch(code,i,j,' ');
         }
     }
+    Curpos=0;
+    PrintCodeatPos(curpos);
     WINDOW *input=newwin(LINES-15,COLS/2-1,6,0);
     init_pair(2,COLOR_BLACK,COLOR_CYAN);
     wattron(input,COLOR_PAIR(2));

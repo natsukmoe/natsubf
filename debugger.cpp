@@ -14,11 +14,36 @@ vector<int> ddid;
 vector<pair<int,pair<int,int>>> ddpos;
 int dds;
 int Curpos;
+WINDOW *title,*code,*input,*output,*ramwatch,*status;
 }
 
 void CheckParenthesis(const vector<char> &);
 
 void PrintCodeatPos(int pos){
+    wattron(code,COLOR_PAIR(1));
+    int Codecols=COLS-1;
+    for(int i=0;i<3;i++){
+        for(int j=0;j<Codecols;j++){
+            mvwaddch(code,i,j,' ');
+        }
+    }
+    int curMidPoint=Codecols/2;
+    int frontChars=curMidPoint;
+    if(frontChars<=pos){
+        int nowPrintedPos=pos-frontChars;
+        for(int i=0;i<frontChars;i++){
+            mvwaddch(code,1,i,Program[nowPrintedPos]);
+            nowPrintedPos++;
+        }
+    }else{
+        int nowCursorPos=frontChars-pos;
+        for(int i=0;i<pos;i++){
+            mvwaddch(code,1,nowCursorPos,Program[i]);
+            nowCursorPos++;
+        }
+    }
+    wattron(code,COLOR_PAIR(6));
+    mvwaddch(code,1,curMidPoint,Program[pos]);
 }
 
 void StartDebug(const vector<string> &files){
@@ -58,13 +83,18 @@ void StartDebug(const vector<string> &files){
     initscr();
     noecho();
     clear();
-    WINDOW *title=newwin(1,COLS,0,0);
+    title=newwin(1,COLS,0,0);
     string Title="Natsubf Brainfuck Debugger";
     mvwprintw(title,0,COLS/2-(int)Title.size()/2,Title.c_str());
     wrefresh(title);
-    WINDOW *code=newwin(3,COLS-1,2,0);
+    code=newwin(3,COLS-1,2,0);
     start_color();
     init_pair(1,COLOR_WHITE,COLOR_RED);
+    init_pair(2,COLOR_BLACK,COLOR_CYAN);
+    init_pair(3,COLOR_BLACK,COLOR_GREEN);
+    init_pair(4,COLOR_BLACK,COLOR_YELLOW);
+    init_pair(5,COLOR_BLACK,COLOR_WHITE);
+    init_pair(6,COLOR_RED,COLOR_WHITE);
     wattron(code,COLOR_PAIR(1));
     for(int i=0;i<3;i++){
         for(int j=0;j<COLS-1;j++){
@@ -72,33 +102,29 @@ void StartDebug(const vector<string> &files){
         }
     }
     Curpos=0;
-    PrintCodeatPos(curpos);
-    WINDOW *input=newwin(LINES-15,COLS/2-1,6,0);
-    init_pair(2,COLOR_BLACK,COLOR_CYAN);
+    PrintCodeatPos(Curpos);
+    input=newwin(LINES-15,COLS/2-1,6,0);
     wattron(input,COLOR_PAIR(2));
     for(int i=0;i<LINES-15;i++){
         for(int j=0;j<COLS/2-1;j++){
             mvwaddch(input,i,j,' ');
         }
     }
-    WINDOW *output=newwin(LINES-15,COLS-COLS/2-2,6,COLS/2+1);
-    init_pair(3,COLOR_BLACK,COLOR_GREEN);
+    output=newwin(LINES-15,COLS-COLS/2-2,6,COLS/2+1);
     wattron(output,COLOR_PAIR(3));
     for(int i=0;i<LINES-15;i++){
         for(int j=0;j<COLS-COLS/2-2;j++){
             mvwaddch(output,i,j,' ');
         }
     }
-    WINDOW *ramwatch=newwin(5,COLS-1,LINES-8,0);
-    init_pair(4,COLOR_BLACK,COLOR_YELLOW);
+    ramwatch=newwin(5,COLS-1,LINES-8,0);
     wattron(ramwatch,COLOR_PAIR(4));
     for(int i=0;i<5;i++){
         for(int j=0;j<COLS-1;j++){
             mvwaddch(ramwatch,i,j,' ');
         }
     }
-    WINDOW *status=newwin(2,COLS-1,LINES-2,0);
-    init_pair(5,COLOR_BLACK,COLOR_WHITE);
+    status=newwin(2,COLS-1,LINES-2,0);
     wattron(status,COLOR_PAIR(5));
     for(int i=0;i<2;i++){
         for(int j=0;j<COLS-1;j++){

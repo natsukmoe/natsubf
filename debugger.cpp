@@ -10,7 +10,6 @@
 
 namespace {
 vector<char> Program,Full;
-int Progsz;
 vector<int> ddid;
 vector<pair<int,pair<int,int>>> ddpos;
 int dds;
@@ -45,13 +44,6 @@ void PrintCodeatPos(int pos){
     }
     wattron(code,COLOR_PAIR(6));
     mvwaddch(code,1,curMidPoint,Program[pos]);
-    wattron(code,COLOR_PAIR(1));
-    int curSorPos=curMidPoint+1,nowPrPos=pos+1;
-    while(curSorPos<Codecols&&nowPrPos<Progsz){
-        mvwaddch(code,1,curSorPos,Program[nowPrPos]);
-        nowPrPos++;
-        curSorPos++;
-    }
 }
 
 void StartDebug(const vector<string> &files){
@@ -85,7 +77,6 @@ void StartDebug(const vector<string> &files){
         }
         Fileid++;
     }
-    Progsz=(int)Program.size();
     CheckParenthesis(Full);
     puts("Natsubf Brainfuck Debugger by Natsu Kinmoe");
     puts("Program used curses engine (pdcurses on Windows and ncurses on macOS)");
@@ -105,6 +96,11 @@ void StartDebug(const vector<string> &files){
     init_pair(5,COLOR_BLACK,COLOR_WHITE);
     init_pair(6,COLOR_RED,COLOR_WHITE);
     wattron(code,COLOR_PAIR(1));
+    for(int i=0;i<3;i++){
+        for(int j=0;j<COLS-1;j++){
+            mvwaddch(code,i,j,' ');
+        }
+    }
     Curpos=0;
     PrintCodeatPos(Curpos);
     input=newwin(LINES-15,COLS/2-1,6,0);

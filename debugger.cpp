@@ -14,8 +14,9 @@ int Progsz;
 vector<int> ddid;
 vector<pair<int,pair<int,int>>> ddpos;
 int dds;
-int Curpos;
+int Curpos,Ramptr;
 WINDOW *title,*code,*input,*output,*ramwatch,*status;
+vector<char> inputs,outputs;
 }
 
 void CheckParenthesis(const vector<char> &);
@@ -52,6 +53,10 @@ void PrintCodeatPos(int pos){
         nowPrPos++;
         curSorPos++;
     }
+}
+
+void PrintRamatPos(int pos){
+    wattron(ramwatch,COLOR_PAIR(4));
 }
 
 void StartDebug(const vector<string> &files){

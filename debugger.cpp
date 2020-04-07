@@ -92,10 +92,11 @@ void StartDebug(const vector<string> &files){
     initscr();
     noecho();
     clear();
-    title=newwin(1,COLS,0,0);
+    title=newwin(2,COLS,0,0);
     string Title="Natsubf Brainfuck Debugger";
     mvwprintw(title,0,COLS/2-(int)Title.size()/2,Title.c_str());
-    wrefresh(title);
+    Title="(Note: use a '#' to make a breakpoint)";
+    mvwprintw(title,1,COLS/2-(int)Title.size()/2,Title.c_str());
     code=newwin(3,COLS-1,2,0);
     start_color();
     init_pair(1,COLOR_WHITE,COLOR_RED);
@@ -140,6 +141,7 @@ void StartDebug(const vector<string> &files){
             mvwaddch(status,i,j,' ');
         }
     }
+    wrefresh(title);
     wrefresh(code);
     wrefresh(input);
     wrefresh(output);

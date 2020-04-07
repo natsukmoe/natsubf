@@ -10,6 +10,7 @@
 
 namespace {
 vector<char> Program,Full;
+int Progsz;
 vector<int> ddid;
 vector<pair<int,pair<int,int>>> ddpos;
 int dds;
@@ -44,6 +45,13 @@ void PrintCodeatPos(int pos){
     }
     wattron(code,COLOR_PAIR(6));
     mvwaddch(code,1,curMidPoint,Program[pos]);
+    wattron(code,COLOR_PAIR(1));
+    int curSorPos=curMidPoint+1,nowPrPos=pos+1;
+    while(curSorPos<Codecols&&nowPrPos<Progsz){
+        mvwaddch(code,1,curSorPos,Program[nowPrPos]);
+        nowPrPos++;
+        curSorPos++;
+    }
 }
 
 void StartDebug(const vector<string> &files){
@@ -77,6 +85,7 @@ void StartDebug(const vector<string> &files){
         }
         Fileid++;
     }
+    Progsz=(int)Program.size();
     CheckParenthesis(Full);
     puts("Natsubf Brainfuck Debugger by Natsu Kinmoe");
     puts("Program used curses engine (pdcurses on Windows and ncurses on macOS)");

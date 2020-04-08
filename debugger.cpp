@@ -66,8 +66,13 @@ void PrintRamatPos(int pos){
         }
     }
     vector<char> ln1,ln2,ln3;
+    int Ls,Rs;
     int DisplayArea=(Ramcols+20)/12;
-    for(int i=pos-DisplayArea;i<pos;i++){
+    for(int i=pos-DisplayArea;i<=pos+DisplayArea;i++){
+        if(i==pos){
+            Ls=(int)ln1.size();
+            Rs=(int)ln1.size()+5;
+        }
         if(i<0||i>29999){
             ln1.push_back(' ');ln1.push_back(' ');ln1.push_back(' ');
             ln1.push_back(' ');ln1.push_back(' ');ln1.push_back(' ');
@@ -131,6 +136,20 @@ void PrintRamatPos(int pos){
                 }else{
                     ln2.push_back('\\');ln2.push_back('x');ln2.push_back(Hexcode[R/16]);
                     ln2.push_back(Hexcode[R%16]);ln2.push_back(' ');ln2.push_back(' ');
+                }
+            }
+            temp.clear();
+            Temp=R;
+            while(Temp){
+                temp.push_back(Temp%10+'0');
+                Temp/=10;
+            }
+            reverse(temp.begin(),temp.end());
+            for(int j=0;j<6;j++){
+                if(j<temp.size()){
+                    ln3.push_back(temp[j]);
+                }else{
+                    ln3.push_back(' ');
                 }
             }
         }

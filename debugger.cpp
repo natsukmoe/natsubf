@@ -10,6 +10,7 @@
 
 namespace {
 vector<char> Program,Full;
+vector<char> ram;
 int Progsz;
 vector<int> ddid;
 vector<pair<int,pair<int,int>>> ddpos;
@@ -17,6 +18,7 @@ int dds;
 int Curpos,Ramptr;
 WINDOW *title,*code,*input,*output,*ramwatch,*status;
 vector<char> inputs,outputs;
+char Hexcode[]="0123456789abcdef";
 }
 
 void CheckParenthesis(const vector<char> &);
@@ -64,6 +66,75 @@ void PrintRamatPos(int pos){
         }
     }
     vector<char> ln1,ln2,ln3;
+    int DisplayArea=(Ramcols+20)/12;
+    for(int i=pos-DisplayArea;i<pos;i++){
+        if(i<0||i>29999){
+            ln1.push_back(' ');ln1.push_back(' ');ln1.push_back(' ');
+            ln1.push_back(' ');ln1.push_back(' ');ln1.push_back(' ');
+            ln2.push_back(' ');ln2.push_back(' ');ln2.push_back(' ');
+            ln2.push_back(' ');ln2.push_back(' ');ln2.push_back(' ');
+            ln3.push_back(' ');ln3.push_back(' ');ln3.push_back(' ');
+            ln3.push_back(' ');ln3.push_back(' ');ln3.push_back(' ');
+        }else{
+            vector<char> temp;
+            int Temp=i;
+            while(Temp){
+                temp.push_back(Temp%10+'0');
+                Temp/=10;
+            }
+            reverse(temp.begin(),temp.end());
+            for(int j=0;j<6;j++){
+                if(j<temp.size()){
+                    ln1.push_back(temp[j]);
+                }else{
+                    ln1.push_back(' ');
+                }
+            }
+            int R=ram[i];
+            if(R<0){
+                R+=256;
+            }
+            if(R>=32&&R<=126){
+                ln2.push_back(ram[i]);ln2.push_back(' ');ln2.push_back(' ');
+                ln2.push_back(' ');ln2.push_back(' ');ln2.push_back(' ');
+            }else{
+                bool isSpecial=0;
+                char SpecialCode;
+                if(R==7){
+                    isSpecial=1;
+                    SpecialCode='a';
+                }else if(R==8){
+                    isSpecial=1;
+                    SpecialCode='b';
+                }else if(R==9){
+                    isSpecial=1;
+                    SpecialCode='t';
+                }else if(R==10){
+                    isSpecial=1;
+                    SpecialCode='n';
+                }else if(R==11){
+                    isSpecial=1;
+                    SpecialCode='v';
+                }else if(R==12){
+                    isSpecial=1;
+                    SpecialCode='f';
+                }else if(R==13){
+                    isSpecial=1;
+                    SpecialCode='r';
+                }else if(R==0){
+                    isSpecial=1;
+                    SpecialCode='0';
+                }
+                if(isSpecial){
+                    ln2.push_back('\\');ln2.push_back(SpecialCode);ln2.push_back(' ');
+                    ln2.push_back(' ');ln2.push_back(' ');ln2.push_back(' ');
+                }else{
+                    ln2.push_back('\\');ln2.push_back('x');ln2.push_back(Hexcode[R/16]);
+                    ln2.push_back(Hexcode[R%16]);ln2.push_back(' ');ln2.push_back(' ');
+                }
+            }
+        }
+    }
 }
 
 void StartDebug(const vector<string> &files){

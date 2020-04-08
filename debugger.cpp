@@ -58,11 +58,12 @@ void PrintCodeatPos(int pos){
 void PrintRamatPos(int pos){
     wattron(ramwatch,COLOR_PAIR(4));
     int Ramcols=COLS-1;
-    for(int i=0;i<3;i++){
+    for(int i=0;i<5;i++){
         for(int j=0;j<Ramcols;j++){
             mvwaddch(ramwatch,i,j,' ');
         }
     }
+    vector<char> ln1,ln2,ln3;
 }
 
 void StartDebug(const vector<string> &files){

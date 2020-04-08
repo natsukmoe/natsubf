@@ -57,6 +57,12 @@ void PrintCodeatPos(int pos){
 
 void PrintRamatPos(int pos){
     wattron(ramwatch,COLOR_PAIR(4));
+    int Ramcols=COLS-1;
+    for(int i=0;i<3;i++){
+        for(int j=0;j<Ramcols;j++){
+            mvwaddch(ramwatch,i,j,' ');
+        }
+    }
 }
 
 void StartDebug(const vector<string> &files){
@@ -111,11 +117,6 @@ void StartDebug(const vector<string> &files){
     init_pair(5,COLOR_BLACK,COLOR_WHITE);
     init_pair(6,COLOR_RED,COLOR_WHITE);
     wattron(code,COLOR_PAIR(1));
-    for(int i=0;i<3;i++){
-        for(int j=0;j<COLS-1;j++){
-            mvwaddch(code,i,j,' ');
-        }
-    }
     Curpos=0;
     PrintCodeatPos(Curpos);
     input=newwin(LINES-15,COLS/2-1,6,0);
@@ -133,12 +134,7 @@ void StartDebug(const vector<string> &files){
         }
     }
     ramwatch=newwin(5,COLS-1,LINES-8,0);
-    wattron(ramwatch,COLOR_PAIR(4));
-    for(int i=0;i<5;i++){
-        for(int j=0;j<COLS-1;j++){
-            mvwaddch(ramwatch,i,j,' ');
-        }
-    }
+    PrintRamatPos(Ramptr);
     status=newwin(2,COLS-1,LINES-2,0);
     wattron(status,COLOR_PAIR(5));
     for(int i=0;i<2;i++){

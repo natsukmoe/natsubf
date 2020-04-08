@@ -66,12 +66,11 @@ void PrintRamatPos(int pos){
         }
     }
     vector<char> ln1,ln2,ln3;
-    int Ls,Rs;
+    int Ls=0;
     int DisplayArea=(Ramcols+20)/12;
     for(int i=pos-DisplayArea;i<=pos+DisplayArea;i++){
         if(i==pos){
             Ls=(int)ln1.size();
-            Rs=(int)ln1.size()+5;
         }
         if(i<0||i>29999){
             ln1.push_back(' ');ln1.push_back(' ');ln1.push_back(' ');
@@ -87,9 +86,12 @@ void PrintRamatPos(int pos){
                 temp.push_back(Temp%10+'0');
                 Temp/=10;
             }
+            if(!temp.size()){
+                temp.push_back('0');
+            }
             reverse(temp.begin(),temp.end());
             for(int j=0;j<6;j++){
-                if(j<temp.size()){
+                if(j<(int)temp.size()){
                     ln1.push_back(temp[j]);
                 }else{
                     ln1.push_back(' ');
@@ -144,6 +146,9 @@ void PrintRamatPos(int pos){
                 temp.push_back(Temp%10+'0');
                 Temp/=10;
             }
+            if(!temp.size()){
+                temp.push_back('0');
+            }
             reverse(temp.begin(),temp.end());
             for(int j=0;j<6;j++){
                 if(j<temp.size()){
@@ -153,6 +158,40 @@ void PrintRamatPos(int pos){
                 }
             }
         }
+    }
+    int curMidPoint=Ramcols/2-3;
+    for(int i=0;i<curMidPoint;i++){
+        mvwaddch(ramwatch,1,i,ln1[Ls-curMidPoint+i]);
+    }
+    wattron(ramwatch,COLOR_PAIR(9));
+    for(int i=0;i<5;i++){
+        mvwaddch(ramwatch,1,i+curMidPoint,ln1[Ls+i]);
+    }
+    wattron(ramwatch,COLOR_PAIR(4));
+    for(int i=curMidPoint+5;i<Ramcols;i++){
+        mvwaddch(ramwatch,1,i,ln1[Ls-curMidPoint+i]);
+    }
+    for(int i=0;i<curMidPoint;i++){
+        mvwaddch(ramwatch,2,i,ln2[Ls-curMidPoint+i]);
+    }
+    wattron(ramwatch,COLOR_PAIR(9));
+    for(int i=0;i<5;i++){
+        mvwaddch(ramwatch,2,i+curMidPoint,ln2[Ls+i]);
+    }
+    wattron(ramwatch,COLOR_PAIR(4));
+    for(int i=curMidPoint+5;i<Ramcols;i++){
+        mvwaddch(ramwatch,2,i,ln2[Ls-curMidPoint+i]);
+    }
+    for(int i=0;i<curMidPoint;i++){
+        mvwaddch(ramwatch,3,i,ln3[Ls-curMidPoint+i]);
+    }
+    wattron(ramwatch,COLOR_PAIR(9));
+    for(int i=0;i<5;i++){
+        mvwaddch(ramwatch,3,i+curMidPoint,ln3[Ls+i]);
+    }
+    wattron(ramwatch,COLOR_PAIR(4));
+    for(int i=curMidPoint+5;i<Ramcols;i++){
+        mvwaddch(ramwatch,3,i,ln3[Ls-curMidPoint+i]);
     }
 }
 
@@ -188,6 +227,7 @@ void StartDebug(const vector<string> &files){
         Fileid++;
     }
     Progsz=(int)Program.size();
+    ram.assign(30000,0);
     CheckParenthesis(Full);
     puts("Natsubf Brainfuck Debugger by Natsu Kinmoe");
     puts("Program used curses engine (pdcurses on Windows and ncurses on macOS)");
@@ -207,6 +247,7 @@ void StartDebug(const vector<string> &files){
     init_pair(4,COLOR_BLACK,COLOR_YELLOW);
     init_pair(5,COLOR_BLACK,COLOR_WHITE);
     init_pair(6,COLOR_RED,COLOR_WHITE);
+    init_pair(9,COLOR_YELLOW,COLOR_BLACK);
     wattron(code,COLOR_PAIR(1));
     Curpos=0;
     PrintCodeatPos(Curpos);

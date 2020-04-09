@@ -225,7 +225,56 @@ void PrintOutput(){
         }
     }
     int Outlines=LINES-15,Outcols=COLS-COLS/2-2;
-    int Outspace=Outlines*Outcols;
+    int Szout=(int)outputs.size();
+    int ln=0,col=0;
+    for(int i=0;i<Szout;i++){
+        if(outputs[i]=='\n'){
+            ln++;
+            col=0;
+        }else{
+            col++;
+            if(col==Outcols){
+                col=0;
+                ln++;
+            }
+        }
+    }
+    if(ln<Outlines){
+        ln=0;
+        col=0;
+        for(int i=0;i<Szout;i++){
+            if(outputs[i]=='\n'){
+                ln++;
+                col=0;
+            }else{
+                mvwaddch(output,ln,col,outputs[i]);
+                col++;
+                if(col==Outcols){
+                    col=0;
+                    ln++;
+                }
+            }
+        }
+    }else{
+        int curl=ln;
+        ln=0;
+        col=0;
+        for(int i=0;i<Szout;i++){
+            if(outputs[i]=='\n'){
+                ln++;
+                col=0;
+            }else{
+                if(ln>=curl-Outlines+1){
+                    mvwaddch(output,ln-curl+Outlines-1,col,outputs[i]);
+                }
+                col++;
+                if(col==Outcols){
+                    col=0;
+                    ln++;
+                }
+            }
+        }
+    }
 }
 
 void StartDebug(const vector<string> &files){
@@ -381,6 +430,12 @@ void StartDebug(const vector<string> &files){
                         PrintRamatPos(Ramptr);
                         PrintStatus("Status: Reloaded","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset]");
                         outputs.clear();
+                        PrintOutput();
+                        wrefresh(code);
+                        wrefresh(input);
+                        wrefresh(output);
+                        wrefresh(ramwatch);
+                        wrefresh(status);
                     }
                 }
             }

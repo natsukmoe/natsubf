@@ -18,6 +18,7 @@ int dds;
 int Curpos,Ramptr;
 WINDOW *title,*code,*input,*output,*ramwatch,*status;
 vector<char> inputs,outputs;
+vector<int> cycbegin;
 int inppos;
 bool isRunning=0;
 char Hexcode[]="0123456789abcdef";
@@ -49,7 +50,7 @@ void PrintCodeatPos(int pos){
         }
     }
     wattron(code,COLOR_PAIR(6));
-    mvwaddch(code,1,curMidPoint,Program[pos]);
+    mvwaddch(code,1,curMidPoint,pos==(int)Program.size()?' ':Program[pos]);
     wattron(code,COLOR_PAIR(1));
     int curSorPos=curMidPoint+1,nowPrPos=pos+1;
     while(curSorPos<Codecols&&nowPrPos<Progsz){
@@ -309,7 +310,7 @@ void PrintInputatPos(int pos,bool cur=0){
         ln=0;
         col=0;
         for(int i=0;i<Szin;i++){
-            if(pos>=inppos){
+            if(i>=inppos){
                 wattron(input,COLOR_PAIR(2));
             }
             if(inputs[i]=='\n'){
@@ -335,7 +336,7 @@ void PrintInputatPos(int pos,bool cur=0){
         ln=0;
         col=0;
         for(int i=0;i<Szin;i++){
-            if(pos>=inppos){
+            if(i>=inppos){
                 wattron(input,COLOR_PAIR(2));
             }
             if(inputs[i]=='\n'){
@@ -363,7 +364,7 @@ void PrintInputatPos(int pos,bool cur=0){
         ln=0;
         col=0;
         for(int i=0;i<Szin;i++){
-            if(pos>=inppos){
+            if(i>=inppos){
                 wattron(input,COLOR_PAIR(2));
             }
             if(inputs[i]=='\n'){
@@ -470,7 +471,7 @@ void StartDebug(const vector<string> &files){
     wrefresh(ramwatch);
     wrefresh(status);
     char ch;
-    bool isInputing=0;
+    bool isInputing=0,runtimeError=0;
     while((ch=wgetch(title))){
         if(isInputing){
             if(ch=='\t'){
@@ -490,7 +491,7 @@ void StartDebug(const vector<string> &files){
             PrintInputatPos(isInputing?(int)inputs.size():inppos,isInputing);
             wrefresh(input);
         }else{
-            if(!isRunning){
+            if(!isRunning&&!runtimeError){
                 if(ch=='l'){
                     auto _prog=Program;
                     auto _dd=ddid;
@@ -578,6 +579,79 @@ void StartDebug(const vector<string> &files){
                     wrefresh(status);
                 }else if(ch=='q'){
                     break;
+                }else if(ch=='s'){
+                    if(Curpos==(int)Program.size()){
+                        PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                        wrefresh(status);
+                        continue;
+                    }
+                    if(Program[Curpos]=='+'){
+                        ram[Ramptr]++;
+                        PrintRamatPos(Ramptr);
+                        wrefresh(ramwatch);
+                    }else if(Program[Curpos]=='-'){
+                        ram[Ramptr]--;
+                        PrintRamatPos(Ramptr);
+                        wrefresh(ramwatch);
+                    }else if(Program[Curpos]=='<'){
+                        if(Ramptr==0){
+                            PrintStatus("Status: Runtime Error (You executed a '<' at position 0)","[Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                            wrefresh(status);
+                            runtimeError=1;
+                            continue;
+                        }else{
+                            Ramptr--;
+                            PrintRamatPos(Ramptr);
+                            wrefresh(ramwatch);
+                        }
+                    }else if(Program[Curpos]=='>'){
+                        if(Ramptr==29999){
+                            PrintStatus("Status: Runtime Error (You executed a '>' at position 29999)","[Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                            wrefresh(status);
+                            runtimeError=1;
+                            continue;
+                        }else{
+                            Ramptr++;
+                            PrintRamatPos(Ramptr);
+                            wrefresh(ramwatch);
+                        }
+                    }else if(Program[Curpos]==','){
+                        if(inppos==(int)inputs.size()){
+                            ram[Ramptr]=-1;
+                        }else{
+                            ram[Ramptr]=inputs[inppos];
+                            inppos++;
+                            PrintInputatPos(inppos);
+                            wrefresh(input);
+                        }
+                    }else if(Program[Curpos]=='.'){
+                        outputs.push_back(ram[Ramptr]);
+                        PrintOutput();
+                        wrefresh(output);
+                    }else if(Program[Curpos]=='['){
+                        if(ram[Ramptr]==0){
+                            int Ceng=1;
+                            while(Ceng){
+                                Curpos++;
+                                if(Program[Curpos]=='['){
+                                    Ceng++;
+                                }else if(Program[Curpos]==']'){
+                                    Ceng--;
+                                }
+                            }
+                        }else{
+                            cycbegin.push_back(Curpos);
+                        }
+                    }else if(Program[Curpos]==']'){
+                        if(ram[Ramptr]!=0){
+                            Curpos=cycbegin.back();
+                        }else{
+                            cycbegin.pop_back();
+                        }
+                    }
+                    Curpos++;
+                    PrintCodeatPos(Curpos);
+                    wrefresh(code);
                 }
             }
         }

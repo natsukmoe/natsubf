@@ -18,10 +18,13 @@ int dds;
 int Curpos,Ramptr;
 WINDOW *title,*code,*input,*output,*ramwatch,*status;
 vector<char> inputs,outputs;
+int inppos;
+bool isRunning=0;
 char Hexcode[]="0123456789abcdef";
 }
 
-void CheckParenthesis(const vector<char> &);
+bool CheckParenthesis(const vector<char> &);
+bool CheckParenthesis(const vector<char> &,bool);
 
 void PrintCodeatPos(int pos){
     wattron(code,COLOR_PAIR(1));
@@ -195,6 +198,36 @@ void PrintRamatPos(int pos){
     }
 }
 
+void PrintStatus(const char a[],const char b[]){
+    wattron(status,COLOR_PAIR(5));
+    int Statcols=COLS-1;
+    int cur=0;
+    for(;a[cur];cur++){
+        mvwaddch(status,0,cur,a[cur]);
+    }
+    for(;cur<Statcols;cur++){
+        mvwaddch(status,0,cur,' ');
+    }
+    cur=0;
+    for(;b[cur];cur++){
+        mvwaddch(status,1,cur,b[cur]);
+    }
+    for(;cur<Statcols;cur++){
+        mvwaddch(status,1,cur,' ');
+    }
+}
+
+void PrintOutput(){
+    wattron(output,COLOR_PAIR(3));
+    for(int i=0;i<LINES-15;i++){
+        for(int j=0;j<COLS-COLS/2-2;j++){
+            mvwaddch(output,i,j,' ');
+        }
+    }
+    int Outlines=LINES-15,Outcols=COLS-COLS/2-2;
+    int Outspace=Outlines*Outcols;
+}
+
 void StartDebug(const vector<string> &files){
     int Fileid=1,Lineid,Colid;
     for(const string &s:files){
@@ -268,18 +301,90 @@ void StartDebug(const vector<string> &files){
     ramwatch=newwin(5,COLS-1,LINES-8,0);
     PrintRamatPos(Ramptr);
     status=newwin(2,COLS-1,LINES-2,0);
-    wattron(status,COLOR_PAIR(5));
-    for(int i=0;i<2;i++){
-        for(int j=0;j<COLS-1;j++){
-            mvwaddch(status,i,j,' ');
-        }
-    }
+    PrintStatus("Status: Not started","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset]");
     wrefresh(title);
     wrefresh(code);
     wrefresh(input);
     wrefresh(output);
     wrefresh(ramwatch);
     wrefresh(status);
-    wgetch(input);
+    char ch;
+    bool isInputing=0;
+    while((ch=wgetch(title))){
+        if(isInputing){
+            if(ch=='\t'){
+                isInputing=0;
+            }else if(ch!=8&&ch!=127){
+                if(ch==13){
+                    ch=10;
+                }
+                inputs.push_back(ch);
+            }else{
+                if((int)inputs.size()!=inppos){
+                    inputs.pop_back();
+                }
+            }
+        }else{
+            if(!isRunning){
+                if(ch=='l'){
+                    auto _prog=Program;
+                    auto _dd=ddid;
+                    auto _ddp=ddpos;
+                    auto _full=Full;
+                    Program.clear();
+                    ddid.clear();
+                    ddpos.clear();
+                    Full.clear();
+                    for(const string &s:files){
+                        Lineid=1;
+                        Colid=1;
+                        ifstream Input(s);
+                        if(!Input){
+                            fprintf(stderr,"Error: Unable to read file %s\n",s.c_str());
+                            exit(1);
+                        }
+                        char ch;
+                        while(Input.get(ch)){
+                            if(ch=='+'||ch=='-'||ch=='<'||ch=='>'||ch=='.'||ch==','||ch=='['||ch==']'||ch=='#'){
+                                Program.push_back(ch);
+                                if(ch=='#'){
+                                    ddid.push_back(dds++);
+                                    ddpos.emplace_back(Fileid,make_pair(Lineid,Colid));
+                                }else{
+                                    ddid.push_back(0);
+                                }
+                            }
+                            Full.push_back(ch);
+                            if(ch=='\n'){
+                                Lineid++;
+                                Colid=1;
+                            }else{
+                                Colid++;
+                            }
+                        }
+                        Fileid++;
+                    }
+                    if(!CheckParenthesis(Full,0)){
+                        Program=_prog;
+                        ddid=_dd;
+                        ddpos=_ddp;
+                        Full=_full;
+                        PrintStatus("Status: Reload failed! Unmatched parenthesis found!","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset]");
+                        wrefresh(status);
+                    }else{
+                        Progsz=(int)Program.size();
+                        ram.assign(30000,0);
+                        inppos=0;
+                        Curpos=0;
+                        PrintCodeatPos(Curpos);
+                        Ramptr=0;
+                        PrintRamatPos(Ramptr);
+                        PrintStatus("Status: Reloaded","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset]");
+                        outputs.clear();
+                    }
+                }
+            }
+        }
+    }
     endwin();
 }

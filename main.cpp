@@ -11,7 +11,7 @@
 void StartRun(const vector<string> &);
 void StartDebug(const vector<string> &);
 
-void CheckParenthesis(const vector<char> &Full){
+bool CheckParenthesis(const vector<char> &Full,bool ExitwhenFail=1){
     int ceng=0;
     int FirstPos=-1;
     int Size=(int)Full.size();
@@ -25,15 +25,24 @@ void CheckParenthesis(const vector<char> &Full){
         if(Full[i]==']'){
             ceng--;
             if(ceng<0){
-                fprintf(stderr,"Error: Unable to match parenthesis at position %d!\n",i);
-                exit(1);
+                if(ExitwhenFail){
+                    fprintf(stderr,"Error: Unable to match parenthesis at position %d!\n",i);
+                    exit(1);
+                }else{
+                    return 0;
+                }
             }
         }
     }
     if(ceng>0){
-        fprintf(stderr,"Error: Unable to match parenthesis at position %d!\n",FirstPos);
-        exit(1);
+        if(ExitwhenFail){
+            fprintf(stderr,"Error: Unable to match parenthesis at position %d!\n",FirstPos);
+            exit(1);
+        }else{
+            return 0;
+        }
     }
+    return 1;
 }
 
 void printHelp(){

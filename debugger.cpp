@@ -624,6 +624,8 @@ void StartDebug(const vector<string> &files){
                             PrintInputatPos(inppos);
                             wrefresh(input);
                         }
+                        PrintRamatPos(Ramptr);
+                        wrefresh(ramwatch);
                     }else if(Program[Curpos]=='.'){
                         outputs.push_back(ram[Ramptr]);
                         PrintOutput();

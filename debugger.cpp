@@ -306,7 +306,7 @@ void PrintInputatPos(int pos,bool cur=0){
     if(pos==Szin){
         fln=ln;
     }
-    if(ln<Inlines){
+    if(ln<Inlines||fln<flh){
         wattron(input,COLOR_PAIR(7));
         ln=0;
         col=0;
@@ -405,7 +405,7 @@ void *runUntilBreakpoint(void *args){
             ram[Ramptr]--;
         }else if(Program[Curpos]=='<'){
             if(Ramptr==0){
-                PrintStatus("Status: Runtime Error (You executed a '<' at position 0)","[Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                PrintStatus("Status: Runtime Error (You executed a '<' at position 0)","[Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                 runtimeError=1;
                 break;
             }else{
@@ -413,7 +413,7 @@ void *runUntilBreakpoint(void *args){
             }
         }else if(Program[Curpos]=='>'){
             if(Ramptr==29999){
-                PrintStatus("Status: Runtime Error (You executed a '>' at position 29999)","[Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                PrintStatus("Status: Runtime Error (You executed a '>' at position 29999)","[Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                 runtimeError=1;
                 break;
             }else{
@@ -457,9 +457,9 @@ void *runUntilBreakpoint(void *args){
     if(!runtimeError&&!finished){
         char temp[100];
         sprintf(temp,"Status: Reached breakpoint at file %d, line %d, column %d",ddpos[ddid[Curpos]].first,ddpos[ddid[Curpos]].second.first,ddpos[ddid[Curpos]].second.second);
-        PrintStatus(temp,"[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+        PrintStatus(temp,"[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
     }else if(finished){
-        PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+        PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
     }
     PrintInputatPos(inppos);
     PrintCodeatPos(Curpos);
@@ -548,7 +548,7 @@ void StartDebug(const vector<string> &files){
     ramwatch=newwin(5,COLS-1,LINES-8,0);
     PrintRamatPos(Ramptr);
     status=newwin(2,COLS-1,LINES-2,0);
-    PrintStatus("Status: Not started","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+    PrintStatus("Status: Not started","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
     wrefresh(title);
     wrefresh(code);
     wrefresh(input);
@@ -561,7 +561,7 @@ void StartDebug(const vector<string> &files){
         if(isInputing){
             if(ch=='\t'){
                 isInputing=0;
-                PrintStatus("Status: Finished inputting","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                PrintStatus("Status: Finished inputting",!runtimeError?"[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]":"[Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                 wrefresh(status);
             }else if(ch!=8&&ch!=127){
                 if(ch==13){
@@ -620,7 +620,7 @@ void StartDebug(const vector<string> &files){
                         ddid=_dd;
                         ddpos=_ddp;
                         Full=_full;
-                        PrintStatus("Status: Reload failed! Unmatched parenthesis found!","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                        PrintStatus("Status: Reload failed! Unmatched parenthesis found!","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                         wrefresh(status);
                     }else{
                         Progsz=(int)Program.size();
@@ -631,7 +631,7 @@ void StartDebug(const vector<string> &files){
                         PrintCodeatPos(Curpos);
                         Ramptr=0;
                         PrintRamatPos(Ramptr);
-                        PrintStatus("Status: Reloaded","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                        PrintStatus("Status: Reloaded","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                         outputs.clear();
                         PrintOutput();
                         wrefresh(code);
@@ -649,7 +649,7 @@ void StartDebug(const vector<string> &files){
                     PrintCodeatPos(Curpos);
                     Ramptr=0;
                     PrintRamatPos(Ramptr);
-                    PrintStatus("Status: Reset","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                    PrintStatus("Status: Reset","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                     outputs.clear();
                     PrintOutput();
                     wrefresh(code);
@@ -667,7 +667,7 @@ void StartDebug(const vector<string> &files){
                     break;
                 }else if(ch=='s'&&!runtimeError){
                     if(Curpos==(int)Program.size()){
-                        PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                        PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                         wrefresh(status);
                         continue;
                     }
@@ -681,7 +681,7 @@ void StartDebug(const vector<string> &files){
                         wrefresh(ramwatch);
                     }else if(Program[Curpos]=='<'){
                         if(Ramptr==0){
-                            PrintStatus("Status: Runtime Error (You executed a '<' at position 0)","[Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                            PrintStatus("Status: Runtime Error (You executed a '<' at position 0)","[Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                             wrefresh(status);
                             runtimeError=1;
                             continue;
@@ -692,7 +692,7 @@ void StartDebug(const vector<string> &files){
                         }
                     }else if(Program[Curpos]=='>'){
                         if(Ramptr==29999){
-                            PrintStatus("Status: Runtime Error (You executed a '>' at position 29999)","[Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                            PrintStatus("Status: Runtime Error (You executed a '>' at position 29999)","[Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                             wrefresh(status);
                             runtimeError=1;
                             continue;
@@ -742,7 +742,7 @@ void StartDebug(const vector<string> &files){
                     wrefresh(code);
                 }else if(ch=='b'&&!runtimeError){
                     if(Curpos==(int)Program.size()){
-                        PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                        PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                         wrefresh(status);
                         continue;
                     }
@@ -753,11 +753,29 @@ void StartDebug(const vector<string> &files){
                     wrefresh(status);
                     pthread_create(&newThread,NULL,runUntilBreakpoint,NULL);
                     isRunning=1;
+                }else if(ch=='c'){
+                    ram.assign(30000,0);
+                    runtimeError=0;
+                    inppos=0;
+                    inputs.clear();
+                    PrintInputatPos(inppos);
+                    Curpos=0;
+                    PrintCodeatPos(Curpos);
+                    Ramptr=0;
+                    PrintRamatPos(Ramptr);
+                    PrintStatus("Status: Reset","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
+                    outputs.clear();
+                    PrintOutput();
+                    wrefresh(code);
+                    wrefresh(input);
+                    wrefresh(output);
+                    wrefresh(ramwatch);
+                    wrefresh(status);
                 }
             }else{
                 if(ch=='p'){
                     pthread_cancel(newThread);
-                    PrintStatus("Status: Paused","[S: Next Step][B: Continue][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                    PrintStatus("Status: Paused","[S: Next Step][B: Continue][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                     PrintInputatPos(inppos);
                     PrintCodeatPos(Curpos);
                     PrintRamatPos(Ramptr);
@@ -779,7 +797,7 @@ void StartDebug(const vector<string> &files){
                     PrintCodeatPos(Curpos);
                     Ramptr=0;
                     PrintRamatPos(Ramptr);
-                    PrintStatus("Status: Reset","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                    PrintStatus("Status: Reset","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][C: Reset and clear input][Q: Quit]");
                     outputs.clear();
                     PrintOutput();
                     wrefresh(code);

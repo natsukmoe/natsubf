@@ -20,8 +20,9 @@ WINDOW *title,*code,*input,*output,*ramwatch,*status;
 vector<char> inputs,outputs;
 vector<int> cycbegin;
 int inppos;
-bool isRunning=0;
+bool isRunning=0,runtimeError=0;
 char Hexcode[]="0123456789abcdef";
+pthread_t newThread;
 }
 
 bool CheckParenthesis(const vector<char> &,bool);
@@ -389,6 +390,83 @@ void PrintInputatPos(int pos,bool cur=0){
     }
 }
 
+void *runUntilBreakpoint(void *args){
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,NULL);
+    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED,NULL);
+    while(1){
+        if(Program[Curpos]=='+'){
+            ram[Ramptr]++;
+        }else if(Program[Curpos]=='-'){
+            ram[Ramptr]--;
+        }else if(Program[Curpos]=='<'){
+            if(Ramptr==0){
+                PrintStatus("Status: Runtime Error (You executed a '<' at position 0)","[Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                runtimeError=1;
+                break;
+            }else{
+                Ramptr--;
+            }
+        }else if(Program[Curpos]=='>'){
+            if(Ramptr==29999){
+                PrintStatus("Status: Runtime Error (You executed a '>' at position 29999)","[Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                runtimeError=1;
+                break;
+            }else{
+                Ramptr++;
+            }
+        }else if(Program[Curpos]==','){
+            if(inppos==(int)inputs.size()){
+                ram[Ramptr]=-1;
+            }else{
+                ram[Ramptr]=inputs[inppos];
+                inppos++;
+            }
+        }else if(Program[Curpos]=='.'){
+            outputs.push_back(ram[Ramptr]);
+        }else if(Program[Curpos]=='['){
+            if(ram[Ramptr]==0){
+                int Ceng=1;
+                while(Ceng){
+                    Curpos++;
+                    if(Program[Curpos]=='['){
+                        Ceng++;
+                    }else if(Program[Curpos]==']'){
+                        Ceng--;
+                    }
+                }
+            }else{
+                cycbegin.push_back(Curpos);
+            }
+        }else if(Program[Curpos]==']'){
+            if(ram[Ramptr]!=0){
+                Curpos=cycbegin.back();
+            }else{
+                cycbegin.pop_back();
+            }
+        }else if(Program[Curpos]=='#'){
+            break;
+        }
+        Curpos++;
+        pthread_testcancel();
+    }
+    if(!runtimeError){
+        char temp[100];
+        sprintf(temp,"Status: Reached breakpoint at file %d, line %d, column %d",ddpos[ddid[Curpos]].first,ddpos[ddid[Curpos]].second.first,ddpos[ddid[Curpos]].second.second);
+        PrintStatus(temp,"[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+    }
+    PrintInputatPos(inppos);
+    PrintCodeatPos(Curpos);
+    PrintRamatPos(Ramptr);
+    PrintOutput();
+    wrefresh(input);
+    wrefresh(output);
+    wrefresh(ramwatch);
+    wrefresh(status);
+    wrefresh(code);
+    isRunning=0;
+    return (void*)0;
+}
+
 void StartDebug(const vector<string> &files){
     int Fileid=1,Lineid,Colid;
     for(const string &s:files){
@@ -471,7 +549,7 @@ void StartDebug(const vector<string> &files){
     wrefresh(ramwatch);
     wrefresh(status);
     char ch;
-    bool isInputing=0,runtimeError=0;
+    bool isInputing=0;
     while((ch=wgetch(title))){
         if(isInputing){
             if(ch=='\t'){
@@ -491,7 +569,7 @@ void StartDebug(const vector<string> &files){
             PrintInputatPos(isInputing?(int)inputs.size():inppos,isInputing);
             wrefresh(input);
         }else{
-            if(!isRunning&&!runtimeError){
+            if(!isRunning){
                 if(ch=='l'){
                     auto _prog=Program;
                     auto _dd=ddid;
@@ -557,6 +635,7 @@ void StartDebug(const vector<string> &files){
                     }
                 }else if(ch=='r'){
                     ram.assign(30000,0);
+                    runtimeError=0;
                     inppos=0;
                     PrintInputatPos(inppos);
                     Curpos=0;
@@ -579,7 +658,7 @@ void StartDebug(const vector<string> &files){
                     wrefresh(status);
                 }else if(ch=='q'){
                     break;
-                }else if(ch=='s'){
+                }else if(ch=='s'&&!runtimeError){
                     if(Curpos==(int)Program.size()){
                         PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
                         wrefresh(status);
@@ -654,6 +733,56 @@ void StartDebug(const vector<string> &files){
                     Curpos++;
                     PrintCodeatPos(Curpos);
                     wrefresh(code);
+                }else if(ch=='b'&&!runtimeError){
+                    if(Curpos==(int)Program.size()){
+                        PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                        wrefresh(status);
+                        continue;
+                    }
+                    if(Program[Curpos]=='#'){
+                        Curpos++;
+                    }
+                    PrintStatus("Status: Running","[P: Pause][R: Stop and reset][Q: Quit]");
+                    wrefresh(status);
+                    pthread_create(&newThread,NULL,runUntilBreakpoint,NULL);
+                    isRunning=1;
+                }
+            }else{
+                if(ch=='p'){
+                    pthread_cancel(newThread);
+                    PrintStatus("Status: Paused","[S: Next Step][B: Continue][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                    PrintInputatPos(inppos);
+                    PrintCodeatPos(Curpos);
+                    PrintRamatPos(Ramptr);
+                    PrintOutput();
+                    wrefresh(input);
+                    wrefresh(output);
+                    wrefresh(ramwatch);
+                    wrefresh(status);
+                    wrefresh(code);
+                    isRunning=0;
+                }else if(ch=='r'){
+                    pthread_cancel(newThread);
+                    isRunning=0;
+                    runtimeError=0;
+                    ram.assign(30000,0);
+                    inppos=0;
+                    PrintInputatPos(inppos);
+                    Curpos=0;
+                    PrintCodeatPos(Curpos);
+                    Ramptr=0;
+                    PrintRamatPos(Ramptr);
+                    PrintStatus("Status: Reset","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                    outputs.clear();
+                    PrintOutput();
+                    wrefresh(code);
+                    wrefresh(input);
+                    wrefresh(output);
+                    wrefresh(ramwatch);
+                    wrefresh(status);
+                }else if(ch=='q'){
+                    pthread_cancel(newThread);
+                    break;
                 }
             }
         }

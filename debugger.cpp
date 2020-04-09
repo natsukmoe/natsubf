@@ -393,7 +393,12 @@ void PrintInputatPos(int pos,bool cur=0){
 void *runUntilBreakpoint(void *args){
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,NULL);
     pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED,NULL);
+    bool finished=0;
     while(1){
+        if(Curpos==(int)Program.size()){
+            finished=1;
+            break;
+        }
         if(Program[Curpos]=='+'){
             ram[Ramptr]++;
         }else if(Program[Curpos]=='-'){
@@ -449,10 +454,12 @@ void *runUntilBreakpoint(void *args){
         Curpos++;
         pthread_testcancel();
     }
-    if(!runtimeError){
+    if(!runtimeError&&!finished){
         char temp[100];
         sprintf(temp,"Status: Reached breakpoint at file %d, line %d, column %d",ddpos[ddid[Curpos]].first,ddpos[ddid[Curpos]].second.first,ddpos[ddid[Curpos]].second.second);
         PrintStatus(temp,"[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+    }else if(finished){
+        PrintStatus("Status: Reached the end of the code","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
     }
     PrintInputatPos(inppos);
     PrintCodeatPos(Curpos);

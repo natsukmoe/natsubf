@@ -223,7 +223,7 @@ void PrintOutput(){
             mvwaddch(output,i,j,' ');
         }
     }
-    int Outlines=LINES-17,Outcols=COLS-COLS/2-4;
+    int Outlines=LINES-17,Outcols=COLS-COLS/2-6;
     int Szout=(int)outputs.size();
     int ln=0,col=0;
     for(int i=0;i<Szout;i++){
@@ -246,7 +246,7 @@ void PrintOutput(){
                 ln++;
                 col=0;
             }else{
-                mvwaddch(output,ln+1,col+1,outputs[i]);
+                mvwaddch(output,ln+1,col+2,outputs[i]);
                 col++;
                 if(col==Outcols){
                     col=0;
@@ -264,7 +264,7 @@ void PrintOutput(){
                 col=0;
             }else{
                 if(ln>=curl-Outlines+1){
-                    mvwaddch(output,ln-curl+Outlines,col+1,outputs[i]);
+                    mvwaddch(output,ln-curl+Outlines,col+2,outputs[i]);
                 }
                 col++;
                 if(col==Outcols){
@@ -283,7 +283,7 @@ void PrintInputatPos(int pos,bool cur=0){
             mvwaddch(input,i,j,' ');
         }
     }
-    int Inlines=LINES-17,Incols=COLS/2-3;
+    int Inlines=LINES-17,Incols=COLS/2-5;
     int Szin=(int)inputs.size();
     int ln=0,col=0,fln=0,flh=Inlines/2;
     for(int i=0;i<Szin;i++){
@@ -316,7 +316,7 @@ void PrintInputatPos(int pos,bool cur=0){
                 ln++;
                 col=0;
             }else{
-                mvwaddch(input,ln+1,col+1,inputs[i]);
+                mvwaddch(input,ln+1,col+2,inputs[i]);
                 col++;
                 if(col==Incols){
                     col=0;
@@ -326,8 +326,8 @@ void PrintInputatPos(int pos,bool cur=0){
         }
         if(cur){
             wattron(input,COLOR_PAIR(3));
-            mvwaddch(input,ln+1,col+1,' ');
-            wmove(input,ln+1,col+1);
+            mvwaddch(input,ln+1,col+2,' ');
+            wmove(input,ln+1,col+2);
         }
     }else if(Inlines-flh>ln-fln){
         int Startln=ln-Inlines+1;
@@ -343,7 +343,7 @@ void PrintInputatPos(int pos,bool cur=0){
                 col=0;
             }else{
                 if(ln>=Startln){
-                    mvwaddch(input,ln-Startln+1,col+1,inputs[i]);
+                    mvwaddch(input,ln-Startln+1,col+2,inputs[i]);
                 }
                 col++;
                 if(col==Incols){
@@ -354,8 +354,8 @@ void PrintInputatPos(int pos,bool cur=0){
         }
         if(cur){
             wattron(input,COLOR_PAIR(3));
-            mvwaddch(input,Inlines,col+1,' ');
-            wmove(input,Inlines,col+1);
+            mvwaddch(input,Inlines,col+2,' ');
+            wmove(input,Inlines,col+2);
         }
     }else{
         int Startln=fln-flh,Endln=Inlines-flh+fln-1;
@@ -371,7 +371,7 @@ void PrintInputatPos(int pos,bool cur=0){
                 col=0;
             }else{
                 if(ln>=Startln&&ln<=Endln){
-                    mvwaddch(input,ln-Startln+1,col+1,inputs[i]);
+                    mvwaddch(input,ln-Startln+1,col+2,inputs[i]);
                 }
                 col++;
                 if(col==Incols){
@@ -382,8 +382,8 @@ void PrintInputatPos(int pos,bool cur=0){
         }
         if(cur){
             wattron(input,COLOR_PAIR(3));
-            mvwaddch(input,Inlines,col+1,' ');
-            wmove(input,Inlines,col+1);
+            mvwaddch(input,Inlines,col+2,' ');
+            wmove(input,Inlines,col+2);
         }
     }
 }

@@ -23,7 +23,6 @@ bool isRunning=0;
 char Hexcode[]="0123456789abcdef";
 }
 
-bool CheckParenthesis(const vector<char> &);
 bool CheckParenthesis(const vector<char> &,bool);
 
 void PrintCodeatPos(int pos){
@@ -224,7 +223,7 @@ void PrintOutput(){
             mvwaddch(output,i,j,' ');
         }
     }
-    int Outlines=LINES-15,Outcols=COLS-COLS/2-2;
+    int Outlines=LINES-17,Outcols=COLS-COLS/2-4;
     int Szout=(int)outputs.size();
     int ln=0,col=0;
     for(int i=0;i<Szout;i++){
@@ -247,7 +246,7 @@ void PrintOutput(){
                 ln++;
                 col=0;
             }else{
-                mvwaddch(output,ln,col,outputs[i]);
+                mvwaddch(output,ln+1,col+1,outputs[i]);
                 col++;
                 if(col==Outcols){
                     col=0;
@@ -265,7 +264,7 @@ void PrintOutput(){
                 col=0;
             }else{
                 if(ln>=curl-Outlines+1){
-                    mvwaddch(output,ln-curl+Outlines-1,col,outputs[i]);
+                    mvwaddch(output,ln-curl+Outlines,col+1,outputs[i]);
                 }
                 col++;
                 if(col==Outcols){
@@ -273,6 +272,118 @@ void PrintOutput(){
                     ln++;
                 }
             }
+        }
+    }
+}
+
+void PrintInputatPos(int pos,bool cur=0){
+    wattron(input,COLOR_PAIR(2));
+    for(int i=0;i<LINES-15;i++){
+        for(int j=0;j<COLS/2-1;j++){
+            mvwaddch(input,i,j,' ');
+        }
+    }
+    int Inlines=LINES-17,Incols=COLS/2-3;
+    int Szin=(int)inputs.size();
+    int ln=0,col=0,fln=0,flh=Inlines/2;
+    for(int i=0;i<Szin;i++){
+        if(pos==i){
+            fln=ln;
+        }
+        if(inputs[i]=='\n'){
+            ln++;
+            col=0;
+        }else{
+            col++;
+            if(col==Incols){
+                col=0;
+                ln++;
+            }
+        }
+    }
+    if(pos==Szin){
+        fln=ln;
+    }
+    if(ln<Inlines){
+        wattron(input,COLOR_PAIR(7));
+        ln=0;
+        col=0;
+        for(int i=0;i<Szin;i++){
+            if(pos>=inppos){
+                wattron(input,COLOR_PAIR(2));
+            }
+            if(inputs[i]=='\n'){
+                ln++;
+                col=0;
+            }else{
+                mvwaddch(input,ln+1,col+1,inputs[i]);
+                col++;
+                if(col==Incols){
+                    col=0;
+                    ln++;
+                }
+            }
+        }
+        if(cur){
+            wattron(input,COLOR_PAIR(3));
+            mvwaddch(input,ln+1,col+1,' ');
+            wmove(input,ln+1,col+1);
+        }
+    }else if(Inlines-flh>ln-fln){
+        int Startln=ln-Inlines+1;
+        wattron(input,COLOR_PAIR(7));
+        ln=0;
+        col=0;
+        for(int i=0;i<Szin;i++){
+            if(pos>=inppos){
+                wattron(input,COLOR_PAIR(2));
+            }
+            if(inputs[i]=='\n'){
+                ln++;
+                col=0;
+            }else{
+                if(ln>=Startln){
+                    mvwaddch(input,ln-Startln+1,col+1,inputs[i]);
+                }
+                col++;
+                if(col==Incols){
+                    col=0;
+                    ln++;
+                }
+            }
+        }
+        if(cur){
+            wattron(input,COLOR_PAIR(3));
+            mvwaddch(input,Inlines,col+1,' ');
+            wmove(input,Inlines,col+1);
+        }
+    }else{
+        int Startln=fln-flh,Endln=Inlines-flh+fln-1;
+        wattron(input,COLOR_PAIR(7));
+        ln=0;
+        col=0;
+        for(int i=0;i<Szin;i++){
+            if(pos>=inppos){
+                wattron(input,COLOR_PAIR(2));
+            }
+            if(inputs[i]=='\n'){
+                ln++;
+                col=0;
+            }else{
+                if(ln>=Startln&&ln<=Endln){
+                    mvwaddch(input,ln-Startln+1,col+1,inputs[i]);
+                }
+                col++;
+                if(col==Incols){
+                    col=0;
+                    ln++;
+                }
+            }
+        }
+        if(cur){
+            wattron(input,COLOR_PAIR(3));
+            mvwaddch(input,Inlines,col+1,' ');
+            wmove(input,Inlines,col+1);
         }
     }
 }
@@ -310,7 +421,7 @@ void StartDebug(const vector<string> &files){
     }
     Progsz=(int)Program.size();
     ram.assign(30000,0);
-    CheckParenthesis(Full);
+    CheckParenthesis(Full,0);
     puts("Natsubf Brainfuck Debugger by Natsu Kinmoe");
     puts("Program used curses engine (pdcurses on Windows and ncurses on macOS)");
     initscr();
@@ -329,6 +440,7 @@ void StartDebug(const vector<string> &files){
     init_pair(4,COLOR_BLACK,COLOR_YELLOW);
     init_pair(5,COLOR_BLACK,COLOR_WHITE);
     init_pair(6,COLOR_RED,COLOR_WHITE);
+    init_pair(7,COLOR_CYAN,COLOR_BLACK);
     init_pair(9,COLOR_YELLOW,COLOR_BLACK);
     wattron(code,COLOR_PAIR(1));
     Curpos=0;
@@ -350,7 +462,7 @@ void StartDebug(const vector<string> &files){
     ramwatch=newwin(5,COLS-1,LINES-8,0);
     PrintRamatPos(Ramptr);
     status=newwin(2,COLS-1,LINES-2,0);
-    PrintStatus("Status: Not started","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset]");
+    PrintStatus("Status: Not started","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
     wrefresh(title);
     wrefresh(code);
     wrefresh(input);
@@ -363,6 +475,8 @@ void StartDebug(const vector<string> &files){
         if(isInputing){
             if(ch=='\t'){
                 isInputing=0;
+                PrintStatus("Status: Finished inputting","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                wrefresh(status);
             }else if(ch!=8&&ch!=127){
                 if(ch==13){
                     ch=10;
@@ -373,6 +487,8 @@ void StartDebug(const vector<string> &files){
                     inputs.pop_back();
                 }
             }
+            PrintInputatPos(isInputing?(int)inputs.size():inppos,isInputing);
+            wrefresh(input);
         }else{
             if(!isRunning){
                 if(ch=='l'){
@@ -418,17 +534,18 @@ void StartDebug(const vector<string> &files){
                         ddid=_dd;
                         ddpos=_ddp;
                         Full=_full;
-                        PrintStatus("Status: Reload failed! Unmatched parenthesis found!","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset]");
+                        PrintStatus("Status: Reload failed! Unmatched parenthesis found!","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
                         wrefresh(status);
                     }else{
                         Progsz=(int)Program.size();
                         ram.assign(30000,0);
                         inppos=0;
+                        PrintInputatPos(inppos);
                         Curpos=0;
                         PrintCodeatPos(Curpos);
                         Ramptr=0;
                         PrintRamatPos(Ramptr);
-                        PrintStatus("Status: Reloaded","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset]");
+                        PrintStatus("Status: Reloaded","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
                         outputs.clear();
                         PrintOutput();
                         wrefresh(code);
@@ -437,6 +554,30 @@ void StartDebug(const vector<string> &files){
                         wrefresh(ramwatch);
                         wrefresh(status);
                     }
+                }else if(ch=='r'){
+                    ram.assign(30000,0);
+                    inppos=0;
+                    PrintInputatPos(inppos);
+                    Curpos=0;
+                    PrintCodeatPos(Curpos);
+                    Ramptr=0;
+                    PrintRamatPos(Ramptr);
+                    PrintStatus("Status: Reset","[S: Next Step][B: Run to breakpoint][Tab: Input][L: Reload][R: Reset][Q: Quit]");
+                    outputs.clear();
+                    PrintOutput();
+                    wrefresh(code);
+                    wrefresh(input);
+                    wrefresh(output);
+                    wrefresh(ramwatch);
+                    wrefresh(status);
+                }else if(ch=='\t'){
+                    isInputing=1;
+                    PrintInputatPos((int)inputs.size(),1);
+                    PrintStatus("Status: Inputting","[Tab: Finish inputting]");
+                    wrefresh(input);
+                    wrefresh(status);
+                }else if(ch=='q'){
+                    break;
                 }
             }
         }

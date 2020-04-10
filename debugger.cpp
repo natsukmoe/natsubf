@@ -586,6 +586,7 @@ void StartDebug(const vector<string> &files){
                     ddid.clear();
                     ddpos.clear();
                     Full.clear();
+                    dds=0;
                     Fileid=1;
                     for(const string &s:files){
                         Lineid=1;

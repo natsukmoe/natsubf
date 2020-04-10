@@ -10,6 +10,7 @@
 
 void StartRun(const vector<string> &);
 void StartDebug(const vector<string> &);
+void StartInteract();
 
 bool CheckParenthesis(const vector<char> &Full,bool ExitwhenFail=1){
     int ceng=0;
@@ -48,7 +49,8 @@ bool CheckParenthesis(const vector<char> &Full,bool ExitwhenFail=1){
 void printHelp(){
     puts("Natsubf Brainfuck Runner and Debugger by Natsu Kinmoe");
     puts("Version: 1.0.0.0");
-    puts("Usage: natsubf [-d|-i] [file...]");
+    puts("Usage: natsubf [-d] [file...]");
+    puts("       natsubf [-i]");
     puts("\t-d\t\tStart a debugger.");
     puts("\t-i\t\tStart interaction.");
 }
@@ -72,7 +74,7 @@ int main(int argc,const char *argv[]) {
         }else if(isDebug){
             StartDebug(filenames);
         }else if(isInter){
-            
+            StartInteract();
         }
     }
     return 0;

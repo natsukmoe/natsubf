@@ -67,3 +67,8 @@ $&@&@@&@@&&@&$$&@&&@@@###@@#####@&$%|!!!!!!!!!!!!!|||||||||||||%%%%%%%%%||||$###
 ```
 
 This is not only an ascii art, but also a program written in Brainfuck!
+
+## How to use
+
+1. Copy all the files in the zip package to the `PATH` directory, such as `C:\Windows\System32` in Windows and `/usr/local/bin` in macOS.
+2. Type `natsubf` in the command line, and read the usage.

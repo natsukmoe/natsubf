@@ -12,20 +12,26 @@ void StartInteract(){
     puts("Natsubf Brainfuck Interaction by Natsu Kinmoe");
     puts("Type '*' to reset the state, type '$' to exit.");
     puts("");
+    rl_bind_key('\t',rl_insert);
+    stifle_history(50);
     string Command;
     int curpos=0;
     vector<char> ram(30000,0);
     vector<int> cycpos;
+    char prompt[25];
     while(1){
         int Val=ram[curpos];
         if(Val<0){
             Val+=256;
         }
-        printf("Natsubf:%d(%d)> ",curpos,Val);
-        if(!getline(cin,Command)){
+        sprintf(prompt,"Natsubf:%d(%d)> ",curpos,Val);
+        //printf("Natsubf:%d(%d)> ",curpos,Val);
+        char *line=readline(prompt);
+        if(!line){
             puts("");
             break;
         }
+        Command=line;
         int khpip=0;
         for(int i=0;i<(int)Command.size();i++){
             if(Command[i]=='['){
@@ -43,9 +49,12 @@ void StartInteract(){
         }
         bool tbc=0;
         while(khpip){
-            printf("... ");
-            string s;
-            getline(cin,s);
+            line=readline("... ");
+            if(!line){
+                puts("");
+                goto ENDWIN;
+            }
+            string s=line;
             for(int i=0;i<(int)s.size();i++){
                 if(s[i]=='['){
                     khpip++;
@@ -120,5 +129,5 @@ void StartInteract(){
             while(getchar()!='\n');
         }
     }
-    endwin();
+ENDWIN:;
 }

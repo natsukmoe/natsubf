@@ -90,7 +90,7 @@ void StartInteract(){
             }else if(Command[i]=='-'){
                 ram[curpos]--;
             }else if(Command[i]=='['){
-                if(!ram[i]){
+                if(!ram[curpos]){
                     khpip=1;
                     while(khpip){
                         i++;
@@ -104,7 +104,7 @@ void StartInteract(){
                     cycpos.push_back(i);
                 }
             }else if(Command[i]==']'){
-                if(!ram[i]){
+                if(!ram[curpos]){
                     cycpos.pop_back();
                 }else{
                     i=cycpos.back();
@@ -120,4 +120,5 @@ void StartInteract(){
             while(getchar()!='\n');
         }
     }
+    endwin();
 }

@@ -93,7 +93,7 @@ void StartInteract(){
             puts("Execution failed! Unmatched right parenthesis found!");
             continue;
         }
-        bool isinp=0;
+        bool isinp=0,isout=0;
         for(int i=0;i<(int)Command.size();i++){
             if(Command[i]=='<'){
                 if(curpos==0){
@@ -112,6 +112,7 @@ void StartInteract(){
                 isinp=1;
             }else if(Command[i]=='.'){
                 putchar(ram[curpos]);
+                isout=1;
             }else if(Command[i]=='+'){
                 ram[curpos]++;
             }else if(Command[i]=='-'){
@@ -145,6 +146,9 @@ void StartInteract(){
         }
         if(isinp){
             while(getchar()!='\n');
+        }
+        if(isout){
+            puts("");
         }
     }
 ENDWIN:;

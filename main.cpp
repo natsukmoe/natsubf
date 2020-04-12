@@ -48,7 +48,7 @@ bool CheckParenthesis(const vector<char> &Full,bool ExitwhenFail=1){
 
 void printHelp(){
     puts("Natsubf Brainfuck Runner and Debugger by Natsu Kinmoe");
-    puts("Version: 1.0.0.0");
+    puts("Version: 1.1.0.0");
     puts("Usage: natsubf [-d] [file...]");
     puts("       natsubf [-i]");
     puts("\t-d\t\tStart a debugger.");

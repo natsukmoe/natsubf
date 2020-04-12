@@ -31,6 +31,16 @@ void StartInteract(){
             puts("");
             break;
         }
+        if(line[0]=='\0'){
+            continue;
+        }
+        char* expansion;
+        int result;
+        result=history_expand(line,&expansion);
+        if (result>=0&&result!=2){
+            add_history(expansion);
+        }
+        free(expansion);
         Command=line;
         int khpip=0;
         for(int i=0;i<(int)Command.size();i++){
@@ -43,7 +53,7 @@ void StartInteract(){
                 }
             }
         }
-        if(khpip){
+        if(khpip<0){
             puts("Execution failed! Unmatched right parenthesis found!");
             continue;
         }
@@ -54,6 +64,14 @@ void StartInteract(){
                 puts("");
                 goto ENDWIN;
             }
+            if(line[0]=='\0'){
+                continue;
+            }
+            result=history_expand(line,&expansion);
+            if (result>=0&&result!=2){
+                add_history(expansion);
+            }
+            free(expansion);
             string s=line;
             for(int i=0;i<(int)s.size();i++){
                 if(s[i]=='['){

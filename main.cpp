@@ -49,21 +49,24 @@ bool CheckParenthesis(const vector<char> &Full,bool ExitwhenFail=1){
 void printHelp(){
     puts("Natsubf Brainfuck Runner and Debugger by Natsu Kinmoe");
     puts("Version: 1.1.0.0");
-    puts("Usage: natsubf [-d] [file...]");
+    puts("Usage: natsubf [-d|-o] [file...]");
     puts("       natsubf [-i]");
     puts("\t-d\t\tStart a debugger.");
     puts("\t-i\t\tStart interaction.");
+    puts("\t-o\t\tRun the program in optimize mode.");
 }
 
 int main(int argc,const char *argv[]) {
     if(argc==1){
         printHelp();
     }else{
-        bool isDebug=false,isInter=false;
+        bool isDebug=false,isInter=false,isopt=false;
         if(!strcmp(argv[1],"-d")){
             isDebug=true;
         }else if(!strcmp(argv[1],"-i")){
             isInter=true;
+        }else if(!strcmp(argv[1],"-o")){
+            isopt=true;
         }
         vector<string> filenames;
         for(int i=1+isDebug;i<argc;i++){
@@ -75,6 +78,8 @@ int main(int argc,const char *argv[]) {
             StartDebug(filenames);
         }else if(isInter){
             StartInteract();
+        }else if(isopt){
+            
         }
     }
     return 0;

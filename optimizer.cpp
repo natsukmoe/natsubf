@@ -12,4 +12,6 @@ namespace{
 vector<int> cmds;
 }
 
-
+void optimizeProgram(){
+    
+}

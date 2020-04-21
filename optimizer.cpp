@@ -10,8 +10,22 @@
 
 namespace{
 vector<int> cmds;
+vector<char> Full;
 }
 
-void optimizeProgram(){
-    
+bool CheckParenthesis(const vector<char> &,bool);
+
+void optimizeProgram(vector<string> &files){
+    for(const string &s:files){
+        ifstream Input(s);
+        if(!Input){
+            fprintf(stderr,"Error: Unable to read file %s\n",s.c_str());
+            exit(1);
+        }
+        char ch;
+        while(Input.get(ch)){
+            Full.push_back(ch);
+        }
+    }
+    CheckParenthesis(Full,1);
 }

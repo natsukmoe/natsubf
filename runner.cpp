@@ -15,7 +15,7 @@ vector<char> Program,Full;
 bool CheckParenthesis(const vector<char> &,bool);
 
 void RunProgram(){
-    CheckParenthesis(Full,0);
+    CheckParenthesis(Full,1);
     int cur=0;
     vector<char> ram(30000,0);
     int Size=(int)Program.size(),pos=0;

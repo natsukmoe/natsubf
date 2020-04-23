@@ -70,7 +70,7 @@ int main(int argc,const char *argv[]) {
             isopt=true;
         }
         vector<string> filenames;
-        for(int i=1+isDebug;i<argc;i++){
+        for(int i=1+(isDebug||isInter||isopt);i<argc;i++){
             filenames.push_back(argv[i]);
         }
         if(!isDebug&&!isInter){

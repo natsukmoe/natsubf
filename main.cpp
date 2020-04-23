@@ -11,6 +11,7 @@
 void StartRun(const vector<string> &);
 void StartDebug(const vector<string> &);
 void StartInteract();
+void optimizeProgram(const vector<string> &);
 
 bool CheckParenthesis(const vector<char> &Full,bool ExitwhenFail=1){
     int ceng=0;
@@ -79,7 +80,7 @@ int main(int argc,const char *argv[]) {
         }else if(isInter){
             StartInteract();
         }else if(isopt){
-            
+            optimizeProgram(filenames);
         }
     }
     return 0;

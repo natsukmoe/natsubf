@@ -15,7 +15,7 @@ vector<char> Full;
 
 bool CheckParenthesis(const vector<char> &,bool);
 
-void optimizeProgram(vector<string> &files){
+void optimizeProgram(const vector<string> &files){
     for(const string &s:files){
         ifstream Input(s);
         if(!Input){

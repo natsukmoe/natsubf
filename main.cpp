@@ -28,7 +28,7 @@ bool CheckParenthesis(const vector<char> &Full,bool ExitwhenFail=1){
             if(ceng<0){
                 if(ExitwhenFail){
                     fprintf(stderr,"Error: Unable to match parenthesis at position %d!\n",i);
-                    exit(1);
+                    exit(4);
                 }else{
                     return 0;
                 }
@@ -38,7 +38,7 @@ bool CheckParenthesis(const vector<char> &Full,bool ExitwhenFail=1){
     if(ceng>0){
         if(ExitwhenFail){
             fprintf(stderr,"Error: Unable to match parenthesis at position %d!\n",FirstPos);
-            exit(1);
+            exit(4);
         }else{
             return 0;
         }

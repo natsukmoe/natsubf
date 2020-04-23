@@ -34,7 +34,7 @@ void RunProgram(){
         }else if(Program[cur]=='>'){
             if(pos==29999){
                 fprintf(stderr,"Error: Memory out of bounds!\nYou executed a '>' at memory position 29999!\n");
-                exit(1);
+                exit(2);
             }
             pos++;
         }else if(Program[cur]==','){
@@ -72,7 +72,7 @@ void StartRun(const vector<string> &files){
         ifstream Input(s);
         if(!Input){
             fprintf(stderr,"Error: Unable to read file %s\n",s.c_str());
-            exit(1);
+            exit(3);
         }
         char ch;
         while(Input.get(ch)){

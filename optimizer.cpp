@@ -9,7 +9,7 @@
 #include "headers.h"
 
 namespace{
-vector<char> cmds;
+vector<short> cmds;
 vector<char> Full;
 }
 
@@ -42,6 +42,26 @@ void optimizeProgram(vector<string> &files){
                     cnt--;
                     if(cnt<0){
                         cnt+=256;
+                    }
+                }
+                i++;
+            }
+            cmds.push_back(cnt);
+        }else if(Full[i]=='<'||Full[i]=='>'){
+            cmds.push_back(2);
+            int cnt=0;
+            while(Full[i]=='<'||Full[i]=='>'){
+                if(Full[i]=='>'){
+                    cnt++;
+                    if(cnt>=30000){
+                        fprintf(stderr,"Error: Memory out of bounds!\nYou executed a '>' at memory position 29999!\n");
+                        exit(2);
+                    }
+                }else{
+                    cnt--;
+                    if(cnt<=-30000){
+                        fprintf(stderr,"Error: Memory out of bounds!\nYou executed a '<' at memory position 0!\n");
+                        exit(1);
                     }
                 }
                 i++;

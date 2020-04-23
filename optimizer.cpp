@@ -20,7 +20,7 @@ void optimizeProgram(vector<string> &files){
         ifstream Input(s);
         if(!Input){
             fprintf(stderr,"Error: Unable to read file %s\n",s.c_str());
-            exit(1);
+            exit(3);
         }
         char ch;
         while(Input.get(ch)){
@@ -67,6 +67,14 @@ void optimizeProgram(vector<string> &files){
                 i++;
             }
             cmds.push_back(cnt);
+        }else if(Full[i]==','){
+            cmds.push_back(3);
+        }else if(Full[i]=='.'){
+            cmds.push_back(4);
+        }else if(Full[i]=='['){
+            cmds.push_back(5);
+        }else if(Full[i]==']'){
+            cmds.push_back(6);
         }
     }
 }

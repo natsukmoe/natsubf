@@ -9,7 +9,7 @@
 #include "headers.h"
 
 namespace{
-vector<int> cmds;
+vector<char> cmds;
 vector<char> Full;
 }
 
@@ -28,4 +28,25 @@ void optimizeProgram(vector<string> &files){
         }
     }
     CheckParenthesis(Full,1);
+    for(int i=0;i<Full.size();i++){
+        if(Full[i]=='+'||Full[i]=='-'){
+            cmds.push_back(1);
+            int cnt=0;
+            while(Full[i]=='+'||Full[i]=='-'){
+                if(Full[i]=='+'){
+                    cnt++;
+                    if(cnt>=256){
+                        cnt-=256;
+                    }
+                }else{
+                    cnt--;
+                    if(cnt<0){
+                        cnt+=256;
+                    }
+                }
+                i++;
+            }
+            cmds.push_back(cnt);
+        }
+    }
 }

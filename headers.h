@@ -15,6 +15,7 @@
 #include <fstream>
 #include <curses.h>
 #include <pthread.h>
+#include <algorithm>
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #include <io.h>
 #define isatty _isatty
@@ -22,8 +23,13 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #else
+#if defined(_UNIX) || defined(_LINUX) || defined(linux) || defined(__LINUX) || defined(__linux) || defined(__linux__)
+#include <readline/readline.h>
+#include <readline/history.h>
+#else
 #include <unistd.h>
 #include <editline/readline.h>
+#endif
 #endif
 using namespace std;
 #endif /* headers_h */

@@ -12,6 +12,7 @@ void StartRun(const vector<string> &);
 void StartDebug(const vector<string> &);
 void StartInteract();
 void optimizeProgram(const vector<string> &);
+void CompileProgram(const vector<string> &,int);
 
 bool CheckParenthesis(const vector<char> &Full,bool ExitwhenFail=1){
     int ceng=0;
@@ -52,35 +53,46 @@ void printHelp(){
     puts("Version: 1.2.0.0");
     puts("Usage: natsubf [-d|-o] [file...]");
     puts("       natsubf [-i]");
+    puts("       natsubf [-c(c|p|r)] [file...]");
     puts("\t-d\t\tStart a debugger.");
     puts("\t-i\t\tStart interaction.");
     puts("\t-o\t\tRun the program in optimize mode.");
+    puts("\t-c\t\tCompile the program to other programming languages:");
+    puts("\t\tc\tCompile to C++");
+    puts("\t\tp\tCompile to Python");
+    puts("\t\tr\tCompile to Ruby");
 }
 
 int main(int argc,const char *argv[]) {
     if(argc==1){
         printHelp();
     }else{
-        bool isDebug=false,isInter=false,isopt=false;
+        bool isDebug=false,isInter=false,isopt=false,isccpp=false,isoption=true;
         if(!strcmp(argv[1],"-d")){
             isDebug=true;
         }else if(!strcmp(argv[1],"-i")){
             isInter=true;
         }else if(!strcmp(argv[1],"-o")){
             isopt=true;
+        }else if(!strcmp(argv[1],"-cc")){
+            isccpp=true;
+        }else{
+            isoption=false;
         }
         vector<string> filenames;
-        for(int i=1+(isDebug||isInter||isopt);i<argc;i++){
+        for(int i=1+isoption;i<argc;i++){
             filenames.push_back(argv[i]);
         }
-        if(!isDebug&&!isInter){
-            StartRun(filenames);
-        }else if(isDebug){
+        if(isDebug){
             StartDebug(filenames);
         }else if(isInter){
             StartInteract();
         }else if(isopt){
             optimizeProgram(filenames);
+        }else if(isccpp){
+            CompileProgram(filenames,1);
+        }else{
+            StartRun(filenames);
         }
     }
     return 0;

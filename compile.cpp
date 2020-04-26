@@ -18,34 +18,64 @@ bool CheckParenthesis(const vector<char> &,bool);
 void CompileCpp(const string &filename){
     ofstream fout(filename);
     puts("Writing header ...");
-    fout<<"/*\
- * Program compiled with natsubf by Natsu Kinmoe\
- * Natsubf is a multifunctional brainfuck tool\
- * https://github.com/natsukmoe/natsubf\
- */";
+    fout<<"/*\n * Program compiled with natsubf by Natsu Kinmoe\n * Natsubf is a multifunctional brainfuck tool\n * https://github.com/natsukmoe/natsubf\n */\n";
     fout<<"#include <cstdio>\n\nchar ram[30000];\nint ptr;\n\n";
     fout<<"int main(){\n";
     int cmdptr=0;
     int Siz=(int)cmds.size();
-    vector<int> cycs;
+    int Tabs=1;
+    puts("Writing program ...");
+    printf("Progress: 0%%\r");
+    int lstpct=0;
     while(cmdptr<Siz){
-        for(int i=0;i<(int)cycs.size()+1;i++){
-            fout<<"\t";
-        }
         if(cmds[cmdptr]==1){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
             cmdptr++;
-            fout<<"ram[ptr]+="<<cmds[cmdptr]<<"\n";
+            fout<<"ram[ptr]+="<<cmds[cmdptr]<<";\n";
         }else if(cmds[cmdptr]==2){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
             cmdptr++;
             if(cmds[cmdptr]>0){
-                fout<<"ptr+="<<cmds[cmdptr]<<"\n";
+                fout<<"ptr+="<<cmds[cmdptr]<<";\n";
             }else{
-                fout<<"ptr-="<<-cmds[cmdptr]<<"\n";
+                fout<<"ptr-="<<-cmds[cmdptr]<<";\n";
             }
+        }else if(cmds[cmdptr]==3){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            fout<<"ram[ptr]=getchar();\n";
+        }else if(cmds[cmdptr]==4){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            fout<<"putchar(ram[ptr]);\n";
+        }else if(cmds[cmdptr]==5){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            Tabs++;
+            fout<<"while(ram[ptr]){\n";
+        }else if(cmds[cmdptr]==6){
+            Tabs--;
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            fout<<"}\n";
+        }
+        cmdptr++;
+        if(cmdptr*100/Siz>lstpct){
+            lstpct=cmdptr*100/Siz;
+            printf("Progress: %d%%\r",lstpct);
         }
     }
     fout<<"\treturn 0;\n";
     fout<<"}\n";
+    puts("Compile to C++ finished successfully.");
 }
 
 void CompileProgram(const vector<string> &files,int lx){
@@ -61,6 +91,13 @@ void CompileProgram(const vector<string> &files,int lx){
         }
     }
     CheckParenthesis(Full,1);
+    int newsiz=0;
+    for(int i=0;i<Full.size();i++){
+        if(Full[i]==','||Full[i]=='.'||Full[i]=='+'||Full[i]=='-'||Full[i]=='<'||Full[i]=='>'||Full[i]=='['||Full[i]==']'){
+            Full[newsiz++]=Full[i];
+        }
+    }
+    Full.erase(Full.begin()+newsiz,Full.end());
     for(int i=0;i<Full.size();i++){
         if(Full[i]=='+'||Full[i]=='-'){
             cmds.push_back(1);
@@ -79,6 +116,7 @@ void CompileProgram(const vector<string> &files,int lx){
                 }
                 i++;
             }
+            i--;
             cmds.push_back(cnt);
         }else if(Full[i]=='<'||Full[i]=='>'){
             cmds.push_back(2);
@@ -99,6 +137,7 @@ void CompileProgram(const vector<string> &files,int lx){
                 }
                 i++;
             }
+            i--;
             cmds.push_back(cnt);
         }else if(Full[i]==','){
             cmds.push_back(3);
@@ -109,53 +148,6 @@ void CompileProgram(const vector<string> &files,int lx){
         }else if(Full[i]==']'){
             cmds.push_back(6);
         }
-    }
-    int cur=0;
-    vector<char> ram(30000,0),stk;
-    int Size=(int)cmds.size(),pos=0;
-    while(cur<Size){
-        if(cmds[cur]==1){
-            cur++;
-            ram[pos]+=cmds[cur];
-        }else if(cmds[cur]==2){
-            cur++;
-            pos+=cmds[cur];
-            if(pos<0){
-                fprintf(stderr,"Error: Memory out of bounds!\nYou executed a '<' at memory position 0!\n");
-                exit(1);
-            }
-            if(pos>29999){
-                fprintf(stderr,"Error: Memory out of bounds!\nYou executed a '>' at memory position 29999!\n");
-                exit(2);
-            }
-        }else if(cmds[cur]==3){
-            ram[pos]=getchar();
-        }else if(cmds[cur]==4){
-            putchar(ram[pos]);
-        }else if(cmds[cur]==5){
-            if(!ram[pos]){
-                int ceng=1;
-                while(ceng){
-                    cur++;
-                    if(cmds[cur]==5){
-                        ceng++;
-                    }else if(cmds[cur]==6){
-                        ceng--;
-                    }else if(cmds[cur]==1||cmds[cur]==2){
-                        cur++;
-                    }
-                }
-            }else{
-                stk.push_back(cur);
-            }
-        }else if(cmds[cur]==6){
-            if(!ram[pos]){
-                stk.pop_back();
-            }else{
-                cur=stk.back();
-            }
-        }
-        cur++;
     }
     string filename=files[0];
     if(files.size()>1){

@@ -28,6 +28,13 @@ void optimizeProgram(const vector<string> &files){
         }
     }
     CheckParenthesis(Full,1);
+    int newsiz=0;
+    for(int i=0;i<Full.size();i++){
+        if(Full[i]==','||Full[i]=='.'||Full[i]=='+'||Full[i]=='-'||Full[i]=='<'||Full[i]=='>'||Full[i]=='['||Full[i]==']'){
+            Full[newsiz++]=Full[i];
+        }
+    }
+    Full.erase(Full.begin()+newsiz,Full.end());
     for(int i=0;i<Full.size();i++){
         if(Full[i]=='+'||Full[i]=='-'){
             cmds.push_back(1);
@@ -46,6 +53,7 @@ void optimizeProgram(const vector<string> &files){
                 }
                 i++;
             }
+            i--;
             cmds.push_back(cnt);
         }else if(Full[i]=='<'||Full[i]=='>'){
             cmds.push_back(2);
@@ -66,6 +74,7 @@ void optimizeProgram(const vector<string> &files){
                 }
                 i++;
             }
+            i--;
             cmds.push_back(cnt);
         }else if(Full[i]==','){
             cmds.push_back(3);
@@ -78,7 +87,8 @@ void optimizeProgram(const vector<string> &files){
         }
     }
     int cur=0;
-    vector<char> ram(30000,0),stk;
+    vector<char> ram(30000,0);
+    vector<int> stk;
     int Size=(int)cmds.size(),pos=0;
     while(cur<Size){
         if(cmds[cur]==1){

@@ -23,7 +23,29 @@ void CompileCpp(const string &filename){
  * Natsubf is a multifunctional brainfuck tool\
  * https://github.com/natsukmoe/natsubf\
  */";
-    fout<<"#include <cstdio>\n\nint ram[30000],ptr;";
+    fout<<"#include <cstdio>\n\nchar ram[30000];\nint ptr;\n\n";
+    fout<<"int main(){\n";
+    int cmdptr=0;
+    int Siz=(int)cmds.size();
+    vector<int> cycs;
+    while(cmdptr<Siz){
+        for(int i=0;i<(int)cycs.size()+1;i++){
+            fout<<"\t";
+        }
+        if(cmds[cmdptr]==1){
+            cmdptr++;
+            fout<<"ram[ptr]+="<<cmds[cmdptr]<<"\n";
+        }else if(cmds[cmdptr]==2){
+            cmdptr++;
+            if(cmds[cmdptr]>0){
+                fout<<"ptr+="<<cmds[cmdptr]<<"\n";
+            }else{
+                fout<<"ptr-="<<-cmds[cmdptr]<<"\n";
+            }
+        }
+    }
+    fout<<"\treturn 0;\n";
+    fout<<"}\n";
 }
 
 void CompileProgram(const vector<string> &files,int lx){

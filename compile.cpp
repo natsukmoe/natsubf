@@ -16,6 +16,14 @@ vector<short> cmds;
 bool CheckParenthesis(const vector<char> &,bool);
 
 void CompileCpp(const string &filename){
+    ofstream fout(filename);
+    puts("Writing header ...");
+    fout<<"/*\
+ * Program compiled with natsubf by Natsu Kinmoe\
+ * Natsubf is a multifunctional brainfuck tool\
+ * https://github.com/natsukmoe/natsubf\
+ */";
+    fout<<"#include <cstdio>\n\nint ram[30000],ptr;";
 }
 
 void CompileProgram(const vector<string> &files,int lx){

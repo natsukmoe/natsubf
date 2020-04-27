@@ -79,6 +79,13 @@ void CompileCpp(const string &filename){
 }
 
 void CompileProgram(const vector<string> &files,int lx){
+    if(!lx){
+        puts("Checking g++ ...");
+        if(system("g++ -v")){
+            puts("g++ not found! Please install C++ compiler and try again!");
+            exit(10);
+        }
+    }
     for(const string &s:files){
         ifstream Input(s);
         if(!Input){
@@ -156,5 +163,19 @@ void CompileProgram(const vector<string> &files,int lx){
     if(lx==1){
         filename+=".cpp";
         CompileCpp(filename);
+    }else if(!lx){
+        #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+        string outfilename=filename+".exe";
+        #else
+        string outfilename=filename+".out";
+        #endif
+        filename+=".~tmp~.cpp";
+        CompileCpp(filename);
+        system(("g++ "+filename+" -o "+outfilename).c_str());
+        #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+        system(("del "+filename).c_str());
+        #else
+        system(("rm "+filename).c_str());
+        #endif
     }
 }

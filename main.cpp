@@ -65,7 +65,7 @@ int main(int argc,const char *argv[]) {
     if(argc==1){
         printHelp();
     }else{
-        bool isDebug=false,isInter=false,isopt=false,isccpp=false,isoption=true;
+        bool isDebug=false,isInter=false,isopt=false,isccpp=false,iscexe=false,isoption=true;
         if(!strcmp(argv[1],"-d")){
             isDebug=true;
         }else if(!strcmp(argv[1],"-i")){
@@ -74,6 +74,8 @@ int main(int argc,const char *argv[]) {
             isopt=true;
         }else if(!strcmp(argv[1],"-cc")){
             isccpp=true;
+        }else if(!strcmp(argv[1],"-c")){
+            iscexe=true;
         }else{
             isoption=false;
         }
@@ -89,6 +91,8 @@ int main(int argc,const char *argv[]) {
             optimizeProgram(filenames);
         }else if(isccpp){
             CompileProgram(filenames,1);
+        }else if(iscexe){
+            CompileProgram(filenames,0);
         }else{
             StartRun(filenames);
         }

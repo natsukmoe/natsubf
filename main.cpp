@@ -53,14 +53,12 @@ void printHelp(){
     puts("Version: 1.2.0.0");
     puts("Usage: natsubf [-d|-o] [file...]");
     puts("       natsubf [-i]");
-    puts("       natsubf [-c(c|p|r)] [file...]");
+    puts("       natsubf [-c(c)] [file...]");
     puts("\t-d\t\tStart a debugger.");
     puts("\t-i\t\tStart interaction.");
     puts("\t-o\t\tRun the program in optimize mode.");
-    puts("\t-c\t\tCompile the program to other programming languages:");
+    puts("\t-c(c)\t\tCompile the program to other programming languages, or to an executable file if there's only -c .");
     puts("\t\tc\tCompile to C++");
-    puts("\t\tp\tCompile to Python");
-    puts("\t\tr\tCompile to Ruby");
 }
 
 int main(int argc,const char *argv[]) {

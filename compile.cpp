@@ -78,6 +78,69 @@ void CompileCpp(const string &filename){
     puts("Compile to C++ finished successfully.");
 }
 
+void CompileJava(const string &filename){
+    ofstream fout(filename);
+    puts("Writing header ...");
+    fout<<"/*\n * Program compiled with natsubf by Natsu Kinmoe\n * Natsubf is a multifunctional brainfuck tool\n * https://github.com/natsukmoe/natsubf\n */\n";
+    fout<<"import java.io.*;\npublic class Main{\n\tstatic byte[] ram=new byte[30000];\n\tstatic int ptr;\n\n";
+    fout<<"\tpublic static byte getchar(){\n\t\tbyte ch=-1;\n\t\ttry{\n\t\t\tch=(byte)System.in.read();\n\t\t}catch(IOException e){}\n\t\treturn ch;\n\t}\n\n";
+    fout<<"\tpublic static void main(String[] args){\n";
+    int cmdptr=0;
+    int Siz=(int)cmds.size();
+    int Tabs=2;
+    puts("Writing program ...");
+    printf("Progress: 0%%\r");
+    int lstpct=0;
+    while(cmdptr<Siz){
+        if(cmds[cmdptr]==1){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            cmdptr++;
+            fout<<"ram[ptr]+="<<cmds[cmdptr]<<";\n";
+        }else if(cmds[cmdptr]==2){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            cmdptr++;
+            if(cmds[cmdptr]>0){
+                fout<<"ptr+="<<cmds[cmdptr]<<";\n";
+            }else{
+                fout<<"ptr-="<<-cmds[cmdptr]<<";\n";
+            }
+        }else if(cmds[cmdptr]==3){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            fout<<"ram[ptr]=getchar();\n";
+        }else if(cmds[cmdptr]==4){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            fout<<"System.out.print((char)ram[ptr]);\n";
+        }else if(cmds[cmdptr]==5){
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            Tabs++;
+            fout<<"while(ram[ptr]!='\\0'){\n";
+        }else if(cmds[cmdptr]==6){
+            Tabs--;
+            for(int i=0;i<Tabs;i++){
+                fout<<"\t";
+            }
+            fout<<"}\n";
+        }
+        cmdptr++;
+        if(cmdptr*100/Siz>lstpct){
+            lstpct=cmdptr*100/Siz;
+            printf("Progress: %d%%\r",lstpct);
+        }
+    }
+    fout<<"\t}\n}\n";
+    puts("Compile to Java finished successfully.");
+}
+
 void CompileProgram(const vector<string> &files,int lx){
     if(!lx){
         puts("Checking g++ ...");
@@ -163,6 +226,14 @@ void CompileProgram(const vector<string> &files,int lx){
     if(lx==1){
         filename+=".cpp";
         CompileCpp(filename);
+    }else if(lx==2){
+        if(filename[filename.size()-1]!='/'&&filename[filename.size()-1]!='\\'){
+            filename.pop_back();
+        }
+        filename+="_javacode";
+        system(("mkdir \""+filename+"\"").c_str());
+        filename+="/Main.java";
+        CompileJava(filename);
     }else if(!lx){
         #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
         string outfilename=filename+".exe";
@@ -172,11 +243,11 @@ void CompileProgram(const vector<string> &files,int lx){
         filename+=".~tmp~.cpp";
         CompileCpp(filename);
         puts("Compiling to executable ...");
-        system(("g++ "+filename+" -o "+outfilename).c_str());
+        system(("g++ \""+filename+"\" -o \""+outfilename+"\"").c_str());
         #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-        system(("del "+filename).c_str());
+        system(("del \""+filename+"\"").c_str());
         #else
-        system(("rm "+filename).c_str());
+        system(("rm \""+filename+"\"").c_str());
         #endif
         puts("Compile to executable finished successfully.");
     }

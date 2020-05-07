@@ -53,19 +53,20 @@ void printHelp(){
     puts("Version: 1.2.0.0");
     puts("Usage: natsubf [-d|-o] [file...]");
     puts("       natsubf [-i]");
-    puts("       natsubf [-c(c)] [file...]");
+    puts("       natsubf [-c(c|j)] [file...]");
     puts("\t-d\t\tStart a debugger.");
     puts("\t-i\t\tStart interaction.");
     puts("\t-o\t\tRun the program in optimize mode.");
-    puts("\t-c(c)\t\tCompile the program to other programming languages, or to an executable file if there's only -c .");
+    puts("\t-c(c|j)\t\tCompile the program to other programming languages, or to an executable file if there's only -c .");
     puts("\t\tc\tCompile to C++");
+    puts("\t\tj\tCompile to Java");
 }
 
 int main(int argc,const char *argv[]) {
     if(argc==1){
         printHelp();
     }else{
-        bool isDebug=false,isInter=false,isopt=false,isccpp=false,iscexe=false,isoption=true;
+        bool isDebug=false,isInter=false,isopt=false,isccpp=false,iscexe=false,isoption=true,iscjav=false;
         if(!strcmp(argv[1],"-d")){
             isDebug=true;
         }else if(!strcmp(argv[1],"-i")){
@@ -74,6 +75,8 @@ int main(int argc,const char *argv[]) {
             isopt=true;
         }else if(!strcmp(argv[1],"-cc")){
             isccpp=true;
+        }else if(!strcmp(argv[1],"-cj")){
+            iscjav=true;
         }else if(!strcmp(argv[1],"-c")){
             iscexe=true;
         }else{
@@ -93,6 +96,8 @@ int main(int argc,const char *argv[]) {
             CompileProgram(filenames,1);
         }else if(iscexe){
             CompileProgram(filenames,0);
+        }else if(iscjav){
+            CompileProgram(filenames,2);
         }else{
             StartRun(filenames);
         }

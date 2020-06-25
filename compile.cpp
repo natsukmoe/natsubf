@@ -288,7 +288,7 @@ void CompileProgram(const vector<string> &files,int lx){
         filename+=".~tmp~.cpp";
         CompileCpp(filename);
         puts("Compiling to executable ...");
-        system(("g++ \""+filename+"\" -o \""+outfilename+"\"").c_str());
+        system(("g++ \""+filename+"\" -o \""+outfilename+"\" -Ofast").c_str());
         #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
         system(("del \""+filename+"\"").c_str());
         #else

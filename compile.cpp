@@ -76,6 +76,7 @@ void CompileCpp(const string &filename){
                         cmdptr++;
                     }
                 }
+                cmdptr++;
                 continue;
             }
             for(int i=0;i<Tabs;i++){
@@ -160,6 +161,7 @@ void CompileJava(const string &filename){
                         cmdptr++;
                     }
                 }
+                cmdptr++;
                 continue;
             }
             for(int i=0;i<Tabs;i++){

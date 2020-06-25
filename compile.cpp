@@ -27,14 +27,21 @@ void CompileCpp(const string &filename){
     puts("Writing program ...");
     printf("Progress: 0%%\r");
     int lstpct=0;
+    bool lstcyc=0;
     while(cmdptr<Siz){
         if(cmds[cmdptr]==1){
+            lstcyc=0;
             for(int i=0;i<Tabs;i++){
                 fout<<"\t";
             }
             cmdptr++;
-            fout<<"ram[ptr]+="<<cmds[cmdptr]<<";\n";
+            if(cmds[cmdptr]<=127){
+                fout<<"ram[ptr]+="<<cmds[cmdptr]<<";\n";
+            }else{
+                fout<<"ram[ptr]-="<<256-cmds[cmdptr]<<";\n";
+            }
         }else if(cmds[cmdptr]==2){
+            lstcyc=0;
             for(int i=0;i<Tabs;i++){
                 fout<<"\t";
             }
@@ -45,22 +52,39 @@ void CompileCpp(const string &filename){
                 fout<<"ptr-="<<-cmds[cmdptr]<<";\n";
             }
         }else if(cmds[cmdptr]==3){
+            lstcyc=0;
             for(int i=0;i<Tabs;i++){
                 fout<<"\t";
             }
             fout<<"ram[ptr]=getchar();\n";
         }else if(cmds[cmdptr]==4){
+            lstcyc=0;
             for(int i=0;i<Tabs;i++){
                 fout<<"\t";
             }
             fout<<"putchar(ram[ptr]);\n";
         }else if(cmds[cmdptr]==5){
+            if(lstcyc){
+                int ceng=1;
+                while(ceng){
+                    cmdptr++;
+                    if(cmds[cmdptr]==5){
+                        ceng++;
+                    }else if(cmds[cmdptr]==6){
+                        ceng--;
+                    }else if(cmds[cmdptr]==1||cmds[cmdptr]==2){
+                        cmdptr++;
+                    }
+                }
+                continue;
+            }
             for(int i=0;i<Tabs;i++){
                 fout<<"\t";
             }
             Tabs++;
             fout<<"while(ram[ptr]){\n";
         }else if(cmds[cmdptr]==6){
+            lstcyc=1;
             Tabs--;
             for(int i=0;i<Tabs;i++){
                 fout<<"\t";
@@ -91,13 +115,18 @@ void CompileJava(const string &filename){
     puts("Writing program ...");
     printf("Progress: 0%%\r");
     int lstpct=0;
+    bool lstcyc=0;
     while(cmdptr<Siz){
         if(cmds[cmdptr]==1){
             for(int i=0;i<Tabs;i++){
                 fout<<"\t";
             }
             cmdptr++;
-            fout<<"ram[ptr]+="<<cmds[cmdptr]<<";\n";
+            if(cmds[cmdptr]<=127){
+                fout<<"ram[ptr]+="<<cmds[cmdptr]<<";\n";
+            }else{
+                fout<<"ram[ptr]-="<<256-cmds[cmdptr]<<";\n";
+            }
         }else if(cmds[cmdptr]==2){
             for(int i=0;i<Tabs;i++){
                 fout<<"\t";
@@ -119,6 +148,20 @@ void CompileJava(const string &filename){
             }
             fout<<"System.out.print((char)ram[ptr]);\n";
         }else if(cmds[cmdptr]==5){
+            if(lstcyc){
+                int ceng=1;
+                while(ceng){
+                    cmdptr++;
+                    if(cmds[cmdptr]==5){
+                        ceng++;
+                    }else if(cmds[cmdptr]==6){
+                        ceng--;
+                    }else if(cmds[cmdptr]==1||cmds[cmdptr]==2){
+                        cmdptr++;
+                    }
+                }
+                continue;
+            }
             for(int i=0;i<Tabs;i++){
                 fout<<"\t";
             }
@@ -227,7 +270,7 @@ void CompileProgram(const vector<string> &files,int lx){
         filename+=".cpp";
         CompileCpp(filename);
     }else if(lx==2){
-        if(filename[filename.size()-1]!='/'&&filename[filename.size()-1]!='\\'){
+        if(filename[filename.size()-1]=='/'||filename[filename.size()-1]=='\\'){
             filename.pop_back();
         }
         filename+="_javacode";

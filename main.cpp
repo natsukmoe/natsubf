@@ -56,6 +56,7 @@ void printHelp(){
     puts("       natsubf [-c(c|j)] [file...]");
     puts("\t-d\t\tStart a debugger.");
     puts("\t-i\t\tStart interaction.");
+    puts("\t-o\t\tRun the program in optimize mode.");
     puts("\t-c(c|j)\t\tCompile the program to other programming languages, or to an executable file if there's only -c .");
     puts("\t\tc\tCompile to C++");
     puts("\t\tj\tCompile to Java");
@@ -65,11 +66,13 @@ int main(int argc,const char *argv[]) {
     if(argc==1){
         printHelp();
     }else{
-        bool isDebug=false,isInter=false,isccpp=false,iscexe=false,isoption=true,iscjav=false;
+        bool isDebug=false,isInter=false,isopt=false,isccpp=false,iscexe=false,isoption=true,iscjav=false;
         if(!strcmp(argv[1],"-d")){
             isDebug=true;
         }else if(!strcmp(argv[1],"-i")){
             isInter=true;
+        }else if(!strcmp(argv[1],"-o")){
+            isopt=true;
         }else if(!strcmp(argv[1],"-cc")){
             isccpp=true;
         }else if(!strcmp(argv[1],"-cj")){
@@ -87,6 +90,8 @@ int main(int argc,const char *argv[]) {
             StartDebug(filenames);
         }else if(isInter){
             StartInteract();
+        }else if(isopt){
+            optimizeProgram(filenames);
         }else if(isccpp){
             CompileProgram(filenames,1);
         }else if(iscexe){

@@ -27,7 +27,7 @@ void CompileCpp(const string &filename){
     puts("Writing program ...");
     printf("Progress: 0%%\r");
     int lstpct=0;
-    bool lstcyc=0;
+    bool lstcyc=1;
     while(cmdptr<Siz){
         if(cmds[cmdptr]==1){
             lstcyc=0;
@@ -116,7 +116,7 @@ void CompileJava(const string &filename){
     puts("Writing program ...");
     printf("Progress: 0%%\r");
     int lstpct=0;
-    bool lstcyc=0;
+    bool lstcyc=1;
     while(cmdptr<Siz){
         if(cmds[cmdptr]==1){
             for(int i=0;i<Tabs;i++){
